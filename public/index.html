@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GameHub - 小游戏集合</title>
+	<style>
+		:root {
+			--primary: #6C5CE7;
+			--accent: #FD79A8;
+			--success: #00B894;
+			--bg-card: #FFFFFF;
+			--text: #2D3436;
+			--text-muted: #636E72;
+			--shadow-lg: 0 16px 48px rgba(108, 92, 231, 0.14);
+			--radius-lg: 20px;
+			--radius-md: 16px;
+			--transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+		}
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+		body {
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+			background: linear-gradient(135deg, #E8E5F7 0%, #F0EEF8 30%, #FDE8F0 70%, #FEE8F5 100%);
+			background-attachment: fixed;
+			min-height: 100vh;
+			color: var(--text);
+			-webkit-font-smoothing: antialiased;
+		}
+		.container { max-width: 760px; margin: 0 auto; padding: 40px 20px; }
+		.header { text-align: center; margin-bottom: 48px; animation: fadeIn 0.6s ease; }
+		@keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+		.header h1 {
+			font-size: 42px; font-weight: 800;
+			background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+			-webkit-background-clip: text; -webkit-text-fill-color: transparent;
+			background-clip: text; letter-spacing: -1px;
+		}
+		.header p { color: var(--text-muted); font-size: 16px; margin-top: 8px; }
+		.game-grid { display: grid; gap: 20px; }
+		.game-card {
+			background: var(--bg-card); border-radius: var(--radius-lg);
+			padding: 28px 32px; box-shadow: var(--shadow-lg);
+			transition: transform var(--transition), box-shadow var(--transition);
+			cursor: pointer; text-decoration: none; color: inherit;
+			display: flex; align-items: center; gap: 20px;
+			animation: fadeIn 0.5s ease backwards;
+		}
+		.game-card:hover { transform: translateY(-4px); box-shadow: 0 20px 56px rgba(108, 92, 231, 0.2); }
+		.game-icon {
+			width: 64px; height: 64px; border-radius: var(--radius-md);
+			background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+			display: flex; align-items: center; justify-content: center;
+			font-size: 32px; flex-shrink: 0; box-shadow: 0 6px 20px rgba(108, 92, 231, 0.3);
+			font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Twemoji Mozilla", "EmojiSymbols", sans-serif;
+			line-height: 1;
+		}
+		.game-info h2 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+		.game-info p { color: var(--text-muted); font-size: 14px; line-height: 1.5; }
+		.game-tag {
+			display: inline-block; padding: 3px 12px; background: #F1F0F8;
+			border-radius: 9999px; font-size: 12px; font-weight: 600;
+			color: var(--primary); margin-top: 8px;
+		}
+		.footer { text-align: center; margin-top: 48px; color: var(--text-muted); font-size: 13px; }
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="header">
+			<h1>GameHub</h1>
+			<p>轻量级实时多人小游戏集合</p>
+		</div>
+		<div class="game-grid">
+			<a class="game-card" href="/ydig" style="animation-delay: 0.1s;">
+				<div class="game-icon">🎨</div>
+				<div class="game-info">
+					<h2>你画我猜</h2>
+					<p>多人实时互动绘画猜词游戏，一人画多人猜。</p>
+					<span class="game-tag">多人 · 实时</span>
+				</div>
+			</a>
+			<a class="game-card" href="/undercover" style="animation-delay: 0.2s;">
+				<div class="game-icon">🕵️</div>
+				<div class="game-info">
+					<h2>谁是卧底</h2>
+					<p>多人聚会推理游戏，找出隐藏在人群中的卧底。</p>
+					<span class="game-tag">多人 · 推理</span>
+				</div>
+			</a>
+		</div>
+		<div class="footer">
+			<p>更多游戏即将上线 &middot; GameHub v1.0</p>
+		</div>
+	</div>
+</body>
+</html>

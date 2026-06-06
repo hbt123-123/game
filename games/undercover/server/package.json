@@ -1,0 +1,15 @@
+{
+  "name": "undercover-server",
+  "version": "1.0.0",
+  "description": "谁是卧底游戏服务端（由根 server.js 通过 game-registry 加载）",
+  "scripts": {
+    "test": "jest --coverage"
+  },
+  "dependencies": {
+    "socket.io": "^4.7.4",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}

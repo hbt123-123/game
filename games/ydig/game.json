@@ -1,0 +1,12 @@
+{
+  "id": "ydig",
+  "name": "你画我猜",
+  "description": "多人实时互动绘画猜词游戏",
+  "version": "1.0.0",
+  "route": "/ydig",
+  "socketPath": "/ydig/socket.io",
+  "maxPlayers": 10,
+  "minPlayers": 2,
+  "clientDir": "client",
+  "serverFile": "server.js"
+}

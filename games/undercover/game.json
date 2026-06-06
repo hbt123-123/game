@@ -1,0 +1,12 @@
+{
+  "id": "undercover",
+  "name": "谁是卧底",
+  "description": "多人聚会推理游戏，找出隐藏的卧底",
+  "version": "1.0.0",
+  "route": "/undercover",
+  "socketPath": "/undercover/socket.io",
+  "maxPlayers": 10,
+  "minPlayers": 3,
+  "clientDir": "client",
+  "serverFile": "server.js"
+}

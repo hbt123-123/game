@@ -1,0 +1,10 @@
+node_modules
+coverage
+dist
+*.log
+.DS_Store
+
+# AI/IDE 辅助文档（按用户要求不纳入版本控制）
+AGENTS.md
+CLAUDE.md
+.claude/

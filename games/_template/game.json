@@ -1,0 +1,12 @@
+{
+  "id": "template",
+  "name": "新游戏模板",
+  "description": "简要描述你的游戏",
+  "version": "1.0.0",
+  "route": "/game/template",
+  "socketPath": "/template/socket.io",
+  "maxPlayers": 4,
+  "minPlayers": 1,
+  "clientDir": "client",
+  "serverFile": "server.js"
+}

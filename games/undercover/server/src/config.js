@@ -1,0 +1,37 @@
+module.exports = {
+  GAME: {
+    MIN_PLAYERS: 3,
+    MAX_PLAYERS: 10,
+    MIN_SPIES: 1,
+    MAX_SPIES: 3,
+    MIN_BLANKS: 0,
+    MAX_BLANKS: 1,
+  },
+  SOCKET_EVENTS: {
+    ROOM_CREATE: 'room:create',
+    ROOM_JOIN: 'room:join',
+    ROOM_LEAVE: 'room:leave',
+    ROOM_CREATED: 'room:created',
+    ROOM_JOINED: 'room:joined',
+    ROOM_PLAYER_JOINED: 'room:playerJoined',
+    ROOM_PLAYER_LEFT: 'room:playerLeft',
+    ROOM_UPDATE: 'room:update',
+
+    GAME_CONFIG: 'game:config',
+    GAME_START: 'game:start',
+    GAME_STARTED: 'game:started',
+    GAME_REVEAL: 'game:reveal',
+    GAME_CONFIRMED: 'game:confirmed',
+    GAME_SPEAK: 'game:speak',
+    GAME_SPEAK_CONFIRMED: 'game:speakConfirmed',
+    GAME_VOTE: 'game:vote',
+    GAME_VOTE_RESULT: 'game:voteResult',
+    GAME_STATE: 'game:state',
+    GAME_OVER: 'game:over',
+    GAME_RESTART: 'game:restart',
+
+    ERROR: 'error',
+    DISCONNECT: 'disconnect',
+    REJOIN: 'room:rejoin',
+  },
+}
