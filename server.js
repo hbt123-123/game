@@ -5,6 +5,9 @@ var io = require('socket.io');
 
 var PORT = 3000;
 
+// 已加载游戏列表（由 game-registry 填充）
+var loadedGames = [];
+
 var app = http.createServer(handler);
 
 function serveFile(res, filePath, contentType) {
@@ -86,52 +89,52 @@ function handler(req, res) {
 		return serveFile(res, sharedPath, getContentType(path.extname(sharedPath)));
 	}
 
-	if (lowerPath === '/ydig') {
-		res.writeHead(302, { Location: '/ydig/' });
-		return res.end();
-	}
+	// ===== 通用游戏路由分发 =====
+	// 遍历已注册游戏，匹配 route 前缀，从 clientDir 提供静态资源；
+	// 对于使用前端路由 / 构建产物缺失的游戏做特殊回退。
+	for (var i = 0; i < loadedGames.length; i++) {
+		var g = loadedGames[i];
+		var route = (g.config.route || '').toLowerCase();
+		if (!route) continue;
 
-	if (lowerPath.indexOf('/ydig/') === 0) {
-		var ydigRoot = path.join(__dirname, 'games/ydig/client');
-		var ydigRel = urlPath.substring('/ydig'.length);
-		if (ydigRel === '' || ydigRel === '/') {
-			ydigRel = '/index.html';
+		// /xxx → 重定向到 /xxx/
+		if (lowerPath === route) {
+			res.writeHead(302, { Location: g.config.route + '/' });
+			return res.end();
 		}
-		var ydigPath = safeResolve(ydigRoot, ydigRel);
-		if (!ydigPath) return sendForbidden(res);
-		var ydigExt = path.extname(ydigPath);
-		if (!ydigExt) {
-			// 无扩展名（如 /ydig/<roomId>）回退到 SPA 首页
-			ydigPath = path.join(ydigRoot, 'index.html');
-			ydigExt = '.html';
-		}
-		return serveFile(res, ydigPath, getContentType(ydigExt));
-	}
 
-	if (lowerPath === '/undercover') {
-		res.writeHead(302, { Location: '/undercover/' });
-		return res.end();
-	}
+		var prefix = route + '/';
+		if (lowerPath.indexOf(prefix) !== 0) continue;
 
-	if (lowerPath.indexOf('/undercover/') === 0) {
-		var distDir = path.join(__dirname, 'games/undercover/client/dist');
-		var distIndex = path.join(distDir, 'index.html');
-		if (!fs.existsSync(distIndex)) {
+		var clientRoot = g.clientDir;
+
+		// undercover：Vue 3 SPA，需 build；产物目录在 client/dist/
+		var distMarker = path.join(clientRoot, 'dist', 'index.html');
+		var useDist = fs.existsSync(distMarker);
+		if (useDist) {
+			clientRoot = path.join(clientRoot, 'dist');
+		} else if (g.config.id === 'undercover') {
 			res.writeHead(503, { 'Content-Type': 'text/html; charset=utf-8' });
 			return res.end('<h1>谁是卧底 — 未构建</h1><p>请先在 <code>games/undercover/client/</code> 目录执行：</p><pre>npm install &amp;&amp; npm run build</pre>');
 		}
-		var ucRel = urlPath.substring('/undercover'.length);
-		if (ucRel === '' || ucRel === '/') {
-			ucRel = '/index.html';
+
+		var gameRel = urlPath.substring(g.config.route.length);
+		if (gameRel === '' || gameRel === '/') {
+			gameRel = '/index.html';
 		}
-		var ucPath = safeResolve(distDir, ucRel);
-		if (!ucPath) return sendForbidden(res);
-		var ucExt = path.extname(ucPath);
-		if (ucExt && fs.existsSync(ucPath)) {
-			return serveFile(res, ucPath, getContentType(ucExt));
+		var gamePath = safeResolve(clientRoot, gameRel);
+		if (!gamePath) return sendForbidden(res);
+
+		var gameExt = path.extname(gamePath);
+		if (gameExt && fs.existsSync(gamePath)) {
+			return serveFile(res, gamePath, getContentType(gameExt));
 		}
-		// Vue Router 前端路由：未匹配实际文件时回退到 index.html
-		return serveFile(res, distIndex, 'text/html');
+		// 无扩展名 / 文件不存在 → SPA 路由回退到 index.html
+		var spaIndex = path.join(clientRoot, 'index.html');
+		if (fs.existsSync(spaIndex)) {
+			return serveFile(res, spaIndex, 'text/html');
+		}
+		return sendNotFound(res);
 	}
 
 	if (lowerPath === '/' || lowerPath === '/index.html') {
@@ -151,6 +154,7 @@ function handler(req, res) {
 
 var registry = require('./shared/game-registry');
 var games = registry.loadGames(path.join(__dirname, 'games'), app, io);
+loadedGames = games;
 
 app.listen(PORT, '0.0.0.0', function() {
 	var os = require('os');

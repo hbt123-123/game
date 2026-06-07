@@ -33,14 +33,20 @@ function loadGames(gamesDir, httpServer, ioModule) {
 			}
 
 			var socketPath = config.socketPath || '/socket.io';
+			var serveClient = (config.serveSocketClient === true) || (config.id === 'ydig');
 			var gameIo = new ioModule.Server(httpServer, {
 				path: socketPath,
-				serveClient: config.id === 'ydig'
+				serveClient: serveClient
 			});
 
 			var gameModule = require(serverFile);
 			var info = gameModule(gameIo);
-			games.push({ config: config, info: info });
+			games.push({
+				config: config,
+				info: info,
+				dir: gamePath,
+				clientDir: path.join(gamePath, config.clientDir || 'client')
+			});
 			console.log('已加载游戏: ' + config.name + ' (' + config.route + ')');
 		} catch (err) {
 			console.error('[game-registry] 加载游戏 ' + entry + ' 失败，已跳过：' + err.message);

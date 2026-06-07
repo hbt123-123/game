@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>贪吃蛇 · GameHub</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<div class="page">
+		<header class="topbar">
+			<a class="back" href="/">← 大厅</a>
+			<h1>🐍 贪吃蛇</h1>
+			<div class="spacer"></div>
+		</header>
+
+		<main class="layout">
+			<section class="board-wrap">
+				<div class="stats">
+					<div class="stat"><span class="label">得分</span><span id="score" class="value">0</span></div>
+					<div class="stat"><span class="label">最高</span><span id="best" class="value">0</span></div>
+					<div class="stat"><span class="label">速度</span><span id="speed" class="value">1</span></div>
+				</div>
+				<canvas id="board" width="600" height="600"></canvas>
+				<div class="controls">
+					<button id="startBtn" class="btn primary">开始</button>
+					<button id="pauseBtn" class="btn" disabled>暂停</button>
+					<button id="resetBtn" class="btn ghost">重开</button>
+				</div>
+				<p class="hint">方向键 ↑ ↓ ← → 或 W A S D 控制 · 空格暂停/继续</p>
+			</section>
+
+			<aside class="rank-wrap">
+				<h2>🏆 全局 Top 10</h2>
+				<ol id="topboard" class="rank-list">
+					<li class="empty">还没有人上榜，快来第一个挑战！</li>
+				</ol>
+				<p class="rank-note">榜单仅保存于服务器内存，重启服务会清空。</p>
+			</aside>
+		</main>
+	</div>
+
+	<div id="overModal" class="modal hidden">
+		<div class="modal-card">
+			<button id="closeModalBtn" class="modal-close" aria-label="关闭">×</button>
+			<h2>🎯 游戏结束</h2>
+			<p class="final">最终得分 <strong id="finalScore">0</strong></p>
+			<p id="rankHint" class="rank-hint"></p>
+			<label class="name-label">
+				起个昵称（最多 12 字）
+				<input id="nameInput" type="text" maxlength="12" placeholder="匿名玩家">
+			</label>
+			<div class="modal-actions">
+				<button id="submitBtn" class="btn primary">提交分数</button>
+				<button id="againBtn" class="btn">再来一局</button>
+			</div>
+		</div>
+	</div>
+
+	<script src="/snake/socket.io/socket.io.js"></script>
+	<script src="main.js"></script>
+</body>
+</html>

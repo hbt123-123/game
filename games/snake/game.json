@@ -1,0 +1,13 @@
+{
+  "id": "snake",
+  "name": "贪吃蛇",
+  "description": "经典单人贪吃蛇，吃得越长越快，挑战全局最高分",
+  "version": "1.0.0",
+  "route": "/snake",
+  "socketPath": "/snake/socket.io",
+  "maxPlayers": 1,
+  "minPlayers": 1,
+  "clientDir": "client",
+  "serverFile": "server.js",
+  "serveSocketClient": true
+}
