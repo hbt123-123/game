@@ -95,8 +95,9 @@ module.exports = function(io) {
 			}
 
 			// 使用 start 命令启动，空字符串为窗口标题（start 命令语法要求）
-			var cmd = 'start "" "' + exePath + '"';
-			child_process.exec(cmd, { shell: true }, function(err) {
+			// 使用 execFile + 参数数组避免 shell 解析导致的命令注入
+			var cmdPath = process.env.COMSPEC || 'cmd.exe';
+			child_process.execFile(cmdPath, ['/c', 'start', '', exePath], function(err) {
 				if (err) {
 					socket.emit('launch_result', { success: false, error: err.message });
 				} else {
