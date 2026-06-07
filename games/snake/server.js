@@ -45,12 +45,39 @@ module.exports = function (io) {
 			// 通过基本校验才更新限速时间戳，避免合法用户被无效请求误伤
 			lastSubmitAt = now;
 
+			var name = sanitizeName(data.name);
 			var entry = {
-				name: sanitizeName(data.name),
+				name: name,
 				score: score,
 				at: now
 			};
-			top10.push(entry);
+
+			// 同名去重：同一名字只保留最高分的一条记录
+			var existingIdx = -1;
+			for (var i = 0; i < top10.length; i++) {
+				if (top10[i].name === name) {
+					existingIdx = i;
+					break;
+				}
+			}
+
+			if (existingIdx >= 0) {
+				if (score <= top10[existingIdx].score) {
+					// 新分数不高于已有记录，不更新榜单但告知排名
+					io.emit('top10', top10);
+					socket.emit('score_submitted', {
+						rank: existingIdx + 1,
+						score: top10[existingIdx].score,
+						unchanged: true
+					});
+					return;
+				}
+				// 新分数更高，替换旧记录
+				top10[existingIdx] = entry;
+			} else {
+				top10.push(entry);
+			}
+
 			top10.sort(function (a, b) { return b.score - a.score; });
 			if (top10.length > 10) top10.length = 10;
 

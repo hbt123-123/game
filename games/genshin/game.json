@@ -1,0 +1,13 @@
+{
+  "id": "genshin",
+  "name": "原神",
+  "description": "检测本地原神安装，一键启动游戏或跳转下载/云游戏",
+  "version": "1.0.0",
+  "route": "/genshin",
+  "socketPath": "/genshin/socket.io",
+  "maxPlayers": 1,
+  "minPlayers": 1,
+  "clientDir": "client",
+  "serverFile": "server.js",
+  "serveSocketClient": true
+}

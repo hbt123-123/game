@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>原神 - GameHub</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<!-- 全屏视频背景 -->
+	<video id="bgVideo" autoplay muted loop playsinline>
+		<source src="bg.3e78e808.mp4" type="video/mp4">
+	</video>
+
+	<!-- Vue 2 应用 -->
+	<div id="app">
+		<!-- 默认/空闲状态 -->
+		<div v-if="state === 'idle'" class="launcher-container">
+			<div class="logo-area">
+				<h1 class="game-title">原神</h1>
+				<p class="game-subtitle">Genshin Impact</p>
+			</div>
+			<button class="launch-btn" @click="scanGame">
+				启 动
+			</button>
+			<p class="hint-text">点击启动自动检测本地游戏</p>
+		</div>
+
+		<!-- 扫描中状态 -->
+		<div v-if="state === 'scanning'" class="launcher-container">
+			<div class="logo-area">
+				<h1 class="game-title">原神</h1>
+				<p class="game-subtitle">Genshin Impact</p>
+			</div>
+			<button class="launch-btn" disabled>
+				<span class="scanning-text">正在扫描</span>
+			</button>
+			<p class="hint-text">正在检测本地游戏安装...</p>
+		</div>
+
+		<!-- 启动成功状态 -->
+		<div v-if="state === 'success'" class="launcher-container">
+			<div class="success-icon">&#10003;</div>
+			<h2 class="success-title">启动成功！</h2>
+			<p class="success-desc">游戏正在运行中...</p>
+		</div>
+
+		<!-- 错误状态 -->
+		<div v-if="state === 'error'" class="launcher-container">
+			<div class="error-icon">&#10007;</div>
+			<h2 class="error-title">启动失败</h2>
+			<p class="error-text">{{ errorMessage }}</p>
+			<button class="launch-btn retry-btn" @click="scanGame">重试</button>
+		</div>
+
+		<!-- 未检测到游戏 / 平台引导 - 模态框 -->
+		<div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
+			<div class="modal-box">
+				<h2>{{ modalTitle }}</h2>
+				<p>{{ modalMessage }}</p>
+				<div class="modal-actions">
+					<a v-if="showDownloadBtn" class="modal-btn download-btn"
+					   :href="downloadUrl"
+					   target="_blank">
+						{{ downloadLabel }}
+					</a>
+					<a class="modal-btn cloud-btn"
+					   href="https://ys.mihoyo.com/cloud/?utm_source=yuanshen_web#/"
+					   target="_blank">
+						云游戏
+					</a>
+				</div>
+				<button class="modal-close" @click="showModal = false">关闭</button>
+			</div>
+		</div>
+	</div>
+
+	<script src="/shared/libs/vue.js"></script>
+	<script src="/genshin/socket.io/socket.io.js"></script>
+	<script src="main.js"></script>
+</body>
+</html>

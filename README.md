@@ -12,6 +12,8 @@
 |------|------|------|------|
 | 🎨 **你画我猜** | `/ydig` | 一人画图，多人猜词，按答题速度计分 | 2-10 人 |
 | 🕵️ **谁是卧底** | `/undercover` | 多人推理，找出拿到不同词语的卧底 | 3-10 人 |
+| 🐍 **贪吃蛇** | `/snake` | 经典贪吃蛇，挑战全局最高分 | 单人 |
+| ⚡ **原神** | `/genshin` | 检测本地原神安装，一键启动或跳转下载/云游戏 | 单人 |
 
 ---
 
@@ -121,7 +123,7 @@ cp -r games/_template games/your-game
   "id": "your-game",
   "name": "你的游戏",
   "route": "/your-game",
-  "socketPath": "/your-game/socket.io",   # 必须唯一
+  "socketPath": "/your-game/socket.io",
   "minPlayers": 1,
   "maxPlayers": 4
 }

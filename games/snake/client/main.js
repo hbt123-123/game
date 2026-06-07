@@ -257,6 +257,12 @@
 	}
 
 	// ===== 输入 =====
+	function setDirection(nx, ny) {
+		// 不允许 180 度反向（基于当前已应用方向 dir，而非 nextDir，避免一帧内连按反向自杀）
+		if (dir.x === -nx && dir.y === -ny) return;
+		nextDir = { x: nx, y: ny };
+	}
+
 	function handleKey(e) {
 		var k = e.key;
 		if (k === ' ') { e.preventDefault(); if (running) pause(); return; }
@@ -269,12 +275,59 @@
 		if (nx === null) return;
 
 		e.preventDefault();
-
-		// 不允许 180 度反向（基于当前已应用方向 dir，而非 nextDir，避免一帧内连按反向自杀）
-		if (dir.x === -nx && dir.y === -ny) return;
-		nextDir = { x: nx, y: ny };
+		setDirection(nx, ny);
 	}
 	document.addEventListener('keydown', handleKey);
+
+	// ===== 移动端：屏幕滑动手势 =====
+	(function () {
+		var touchStartX = 0;
+		var touchStartY = 0;
+		var SWIPE_MIN = 20; // 最小滑动距离（px）
+
+		function onTouchStart(e) {
+			if (e.touches.length !== 1) return;
+			touchStartX = e.touches[0].clientX;
+			touchStartY = e.touches[0].clientY;
+		}
+
+		function onTouchEnd(e) {
+			if (e.changedTouches.length !== 1) return;
+			var dx = e.changedTouches[0].clientX - touchStartX;
+			var dy = e.changedTouches[0].clientY - touchStartY;
+			var absDx = Math.abs(dx);
+			var absDy = Math.abs(dy);
+
+			if (Math.max(absDx, absDy) < SWIPE_MIN) return;
+
+			var nx, ny;
+			if (absDx > absDy) {
+				nx = dx > 0 ? 1 : -1;
+				ny = 0;
+			} else {
+				nx = 0;
+				ny = dy > 0 ? 1 : -1;
+			}
+			setDirection(nx, ny);
+		}
+
+		canvas.addEventListener('touchstart', onTouchStart, { passive: true });
+		canvas.addEventListener('touchend', onTouchEnd, { passive: true });
+	})();
+
+	// ===== 移动端：方向按钮 =====
+	(function () {
+		var btns = document.querySelectorAll('.dpad-btn[data-dir]');
+		var dirMap = { up: { x: 0, y: -1 }, down: { x: 0, y: 1 }, left: { x: -1, y: 0 }, right: { x: 1, y: 0 } };
+
+		for (var i = 0; i < btns.length; i++) {
+			btns[i].addEventListener('pointerdown', function (e) {
+				e.preventDefault();
+				var d = dirMap[this.dataset.dir];
+				if (d) setDirection(d.x, d.y);
+			});
+		}
+	})();
 
 	startBtn.addEventListener('click', start);
 	pauseBtn.addEventListener('click', pause);
@@ -326,6 +379,10 @@
 		}
 		if (data.error) {
 			rankHint.textContent = '⚠️ 分数无效，未上榜';
+			return;
+		}
+		if (data.unchanged) {
+			rankHint.textContent = 'ℹ️ 该昵称已有更高分（第 ' + data.rank + ' 名，' + data.score + ' 分），未更新';
 			return;
 		}
 		if (data.rank) {

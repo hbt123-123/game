@@ -54,6 +54,11 @@
 			font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Twemoji Mozilla", "EmojiSymbols", sans-serif;
 			line-height: 1;
 		}
+		.game-icon-img {
+			width: 64px; height: 64px; border-radius: var(--radius-md);
+			object-fit: cover; flex-shrink: 0;
+			box-shadow: 0 6px 20px rgba(108, 92, 231, 0.3);
+		}
 		.game-info h2 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
 		.game-info p { color: var(--text-muted); font-size: 14px; line-height: 1.5; }
 		.game-tag {
@@ -79,7 +84,15 @@
 					<span class="game-tag">多人 · 实时</span>
 				</div>
 			</a>
-			<a class="game-card" href="/undercover" style="animation-delay: 0.2s;">
+			<a class="game-card" href="/genshin" style="animation-delay: 0.15s;">
+					<img class="game-icon-img" src="/img/logo_home_header.82e54fa5.png" alt="原神">
+					<div class="game-info">
+						<h2>原神</h2>
+						<p>原神启动</p>
+						<span class="game-tag">工具 · 启动器</span>
+					</div>
+				</a>
+				<a class="game-card" href="/undercover" style="animation-delay: 0.2s;">
 				<div class="game-icon">🕵️</div>
 				<div class="game-info">
 					<h2>谁是卧底</h2>

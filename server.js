@@ -39,7 +39,10 @@ function getContentType(ext) {
 		'.jpg': 'image/jpeg',
 		'.svg': 'image/svg+xml',
 		'.ico': 'image/x-icon',
-		'.json': 'application/json'
+		'.json': 'application/json',
+		'.mp4': 'video/mp4',
+		'.webm': 'video/webm',
+		'.woff2': 'font/woff2'
 	};
 	return types[ext] || 'text/plain';
 }
