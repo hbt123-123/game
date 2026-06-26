@@ -29,6 +29,7 @@
 	var againBtn  = document.getElementById('againBtn');
 	var closeModalBtn = document.getElementById('closeModalBtn');
 	var topboard  = document.getElementById('topboard');
+	var hintEl    = document.getElementById('hintText');
 
 	// ===== 状态 =====
 	var snake = [];
@@ -99,7 +100,7 @@
 		speedEl.textContent = speedLevel;
 		if (running && !paused) {
 			clearInterval(loopTimer);
-			loopTimer = setInterval(tick, tickMs);
+			loopTimer = setInterval(function () { pollGamepad(); tick(); }, tickMs);
 		}
 	}
 
@@ -220,7 +221,7 @@
 		startBtn.disabled = true;
 		pauseBtn.disabled = false;
 		pauseBtn.textContent = '暂停';
-		loopTimer = setInterval(tick, tickMs);
+		loopTimer = setInterval(function () { pollGamepad(); tick(); }, tickMs);
 	}
 
 	function pause() {
@@ -262,6 +263,91 @@
 		if (dir.x === -nx && dir.y === -ny) return;
 		nextDir = { x: nx, y: ny };
 	}
+
+	// ===== 手柄输入（Gamepad API）=====
+	var gamepadConnected = false;
+	var gamepadPrevButtons = [];  // 上一帧按钮状态，用于检测按下边缘
+
+	function pollGamepad() {
+		var gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
+		if (!gamepads) return;
+
+		var gp = null;
+		for (var i = 0; i < gamepads.length; i++) {
+			if (gamepads[i]) { gp = gamepads[i]; break; }
+		}
+		if (!gp) return;
+
+		// 初始化上一帧状态
+		if (gamepadPrevButtons.length === 0) {
+			for (var j = 0; j < gp.buttons.length; j++) {
+				gamepadPrevButtons[j] = gp.buttons[j].pressed;
+			}
+			return;
+		}
+
+		// --- 方向：D-pad ---
+		// 标准映射：buttons[12]=上, [13]=下, [14]=左, [15]=右
+		if (gp.buttons[12] && gp.buttons[12].pressed) { setDirection(0, -1); }
+		else if (gp.buttons[13] && gp.buttons[13].pressed) { setDirection(0, 1); }
+		else if (gp.buttons[14] && gp.buttons[14].pressed) { setDirection(-1, 0); }
+		else if (gp.buttons[15] && gp.buttons[15].pressed) { setDirection(1, 0); }
+
+		// --- 方向：左摇杆（作为 D-pad 的补充）---
+		// axes[0]=水平(-1左~1右), axes[1]=垂直(-1上~1下)
+		var deadZone = 0.5;
+		var ax = gp.axes[0] || 0;
+		var ay = gp.axes[1] || 0;
+		if (Math.abs(ax) > deadZone || Math.abs(ay) > deadZone) {
+			if (Math.abs(ax) > Math.abs(ay)) {
+				setDirection(ax > 0 ? 1 : -1, 0);
+			} else {
+				setDirection(0, ay > 0 ? 1 : -1);
+			}
+		}
+
+		// --- 按钮（仅在按下边缘触发，避免按住时反复触发）---
+		// A 键 (button 0) → 开始游戏
+		if (gp.buttons[0] && gp.buttons[0].pressed && !gamepadPrevButtons[0]) {
+			start();
+		}
+		// B 键 (button 1) → 暂停/继续
+		if (gp.buttons[1] && gp.buttons[1].pressed && !gamepadPrevButtons[1]) {
+			pause();
+		}
+		// X 键 (button 2) → 重开
+		if (gp.buttons[2] && gp.buttons[2].pressed && !gamepadPrevButtons[2]) {
+			fullReset();
+		}
+		// Start 键 (button 9) → 开始
+		if (gp.buttons[9] && gp.buttons[9].pressed && !gamepadPrevButtons[9]) {
+			start();
+		}
+		// Select/Back 键 (button 8) → 重开
+		if (gp.buttons[8] && gp.buttons[8].pressed && !gamepadPrevButtons[8]) {
+			fullReset();
+		}
+
+		// 保存当前帧按钮状态
+		for (var k = 0; k < gp.buttons.length; k++) {
+			gamepadPrevButtons[k] = gp.buttons[k].pressed;
+		}
+	}
+
+	// 手柄连接/断开事件
+	window.addEventListener('gamepadconnected', function (e) {
+		gamepadConnected = true;
+		gamepadPrevButtons = [];
+		updateHint();
+		console.log('手柄已连接:', e.gamepad.id);
+	});
+
+	window.addEventListener('gamepaddisconnected', function (e) {
+		gamepadConnected = false;
+		gamepadPrevButtons = [];
+		updateHint();
+		console.log('手柄已断开:', e.gamepad.id);
+	});
 
 	function handleKey(e) {
 		var k = e.key;
@@ -454,6 +540,14 @@
 			li2.appendChild(nm);
 			li2.appendChild(sc);
 			topboard.appendChild(li2);
+		}
+	}
+
+	function updateHint() {
+		if (gamepadConnected) {
+			hintEl.textContent = '手柄已连接 · 方向键 / WASD / 屏幕滑动 / 方向按钮控制 · 空格暂停/继续';
+		} else {
+			hintEl.textContent = '方向键 / WASD / 屏幕滑动 / 方向按钮控制 · 空格暂停/继续';
 		}
 	}
 
