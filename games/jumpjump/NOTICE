@@ -1,0 +1,12 @@
+JumpJump 跳一跳 (Three.js 重写版)
+Copyright (c) 2026 GameHub
+
+本游戏基于 Unity-JumpJump 项目（https://github.com/zhenghongzhi/Unity-JumpJump）
+重新实现，原项目采用 MIT 许可证，原作者：关尔Manic (2018)。
+
+核心玩法逻辑（蓄力跳跃、精准度判定、连击翻倍）参考自原项目
+Player.cs，视觉参数（颜色、尺寸）提取自原项目 Materials 与 Prefabs。
+
+原项目 LICENSE 见：https://github.com/zhenghongzhi/Unity-JumpJump/blob/master/LICENSE
+
+Three.js 库（r128）由 https://threejs.org/ 提供，亦采用 MIT 许可证。

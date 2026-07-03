@@ -1,0 +1,13 @@
+{
+  "id": "jumpjump",
+  "name": "JumpJump 跳一跳",
+  "description": "3D 蓄力跳跃精准小游戏，复刻微信跳一跳玩法",
+  "version": "1.0.0",
+  "route": "/jumpjump",
+  "socketPath": "/jumpjump/socket.io",
+  "maxPlayers": 1,
+  "minPlayers": 1,
+  "serveSocketClient": true,
+  "clientDir": "client",
+  "serverFile": "server.js"
+}

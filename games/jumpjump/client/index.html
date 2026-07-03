@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>JumpJump 跳一跳 - GameHub</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<div id="app">
+		<div id="game-canvas-container"></div>
+		<div id="hud">
+			<div id="score">0</div>
+			<div id="combo-hint"></div>
+		</div>
+		<div id="charge-bar" class="hidden">
+			<div id="charge-bar-fill"></div>
+		</div>
+		<div id="score-floats"></div>
+		<div id="game-over-panel" class="hidden">
+			<h2>游戏结束</h2>
+			<p>本局得分：<span id="final-score">0</span></p>
+			<div class="name-row">
+				<input id="player-name" placeholder="输入昵称" maxlength="12" value="匿名玩家">
+				<button id="submit-score-btn">提交分数</button>
+			</div>
+			<button id="restart-btn">重新开始</button>
+			<h3>排行榜 Top 10</h3>
+			<ol id="ranking-list"></ol>
+		</div>
+		<div id="loading-tip">正在加载 3D 资源...</div>
+	</div>
+	<script src="/shared/libs/three.min.js"></script>
+	<script src="/jumpjump/socket.io/socket.io.js"></script>
+	<script src="config.js"></script>
+	<script src="renderer.js"></script>
+	<script src="physics.js"></script>
+	<script src="input.js"></script>
+	<script src="ranking.js"></script>
+	<script src="game.js"></script>
+	<script src="main.js"></script>
+</body>
+</html>
