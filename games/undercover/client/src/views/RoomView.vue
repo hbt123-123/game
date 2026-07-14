@@ -163,21 +163,59 @@ function handleJoinByLink() {
   gameStore.joinRoom(routeRoomId, joinName.value.trim())
 }
 
-function copyRoomId() {
-  if (!room.value) return
-  navigator.clipboard.writeText(room.value.id).then(() => {
-    copiedId.value = true
-    setTimeout(() => { copiedId.value = false }, 2000)
-  })
+async function copyText(text) {
+  // 优先使用 Clipboard API（HTTPS / localhost 可用）
+  if (navigator.clipboard && window.isSecureContext) {
+    try {
+      await navigator.clipboard.writeText(text)
+      return true
+    } catch (err) {
+      console.warn('Clipboard API 失败，降级到 execCommand:', err)
+    }
+  }
+  // 降级方案：使用临时 textarea + execCommand('copy')
+  try {
+    const textarea = document.createElement('textarea')
+    textarea.value = text
+    textarea.style.position = 'fixed'
+    textarea.style.top = '-9999px'
+    textarea.style.left = '-9999px'
+    textarea.style.opacity = '0'
+    document.body.appendChild(textarea)
+    textarea.focus()
+    textarea.select()
+    const ok = document.execCommand('copy')
+    document.body.removeChild(textarea)
+    return ok
+  } catch (err) {
+    console.error('复制失败:', err)
+    return false
+  }
 }
 
-function copyRoomLink() {
+async function copyRoomId() {
+  if (!room.value) return
+  const ok = await copyText(room.value.id)
+  if (ok) {
+    copiedId.value = true
+    setTimeout(() => { copiedId.value = false }, 2000)
+  } else {
+    gameStore.error = '复制失败，请手动长按房间号复制'
+    setTimeout(() => { gameStore.clearError() }, 3000)
+  }
+}
+
+async function copyRoomLink() {
   if (!room.value) return
   const link = `${window.location.origin}/undercover/room/${room.value.id}`
-  navigator.clipboard.writeText(link).then(() => {
+  const ok = await copyText(link)
+  if (ok) {
     copiedLink.value = true
     setTimeout(() => { copiedLink.value = false }, 2000)
-  })
+  } else {
+    gameStore.error = '复制失败，请手动复制链接'
+    setTimeout(() => { gameStore.clearError() }, 3000)
+  }
 }
 
 const emptySlots = computed(() => {

@@ -1,4 +1,5 @@
 const { v4: uuidv4 } = require('uuid')
+const crypto = require('crypto')
 const Player = require('./Player')
 const { createWordPicker } = require('../words')
 const { GAME: GAME_CONFIG } = require('../config')
@@ -161,15 +162,16 @@ class Room {
     this.tieCandidateIds = []
 
     const playerArray = Array.from(this.players.values())
+    const n = playerArray.length
     const spyIndices = new Set()
     while (spyIndices.size < this.config.spyCount) {
-      spyIndices.add(Math.floor(Math.random() * playerArray.length))
+      spyIndices.add(crypto.randomInt(0, n))
     }
 
     let blankIndex = -1
     if (this.config.blankCount > 0) {
       do {
-        blankIndex = Math.floor(Math.random() * playerArray.length)
+        blankIndex = crypto.randomInt(0, n)
       } while (spyIndices.has(blankIndex))
     }
 
@@ -192,6 +194,11 @@ class Room {
 
     this.revealOrder = playerArray.map(p => p.socketId)
     this.phase = GamePhase.REVEALING
+
+    const rolesSummary = playerArray.map((p, i) =>
+      `${p.name}=${p.roleName}${spyIndices.has(i) ? '(卧底)' : ''}`
+    ).join(', ')
+    console.log(`[角色分配] 房间 ${this.id} | ${rolesSummary}`)
   }
 
   getRevealPlayer() {
@@ -420,11 +427,15 @@ class Room {
   }
 
   toGameStateJSON() {
+    const phaseOver = this.phase === GamePhase.OVER
     return {
       id: this.id,
       phase: this.phase,
       round: this.round,
-      players: Array.from(this.players.values()).map(p => p.toPublicJSON()),
+      // 游戏结束时揭示所有玩家身份（含角色），其他阶段只暴露公开信息
+      players: Array.from(this.players.values()).map(p =>
+        phaseOver ? p.toEliminatedJSON() : p.toPublicJSON()
+      ),
       currentPlayerIndex: this.currentPlayerIndex,
       revealOrder: this.revealOrder,
       discussOrder: this.discussOrder,

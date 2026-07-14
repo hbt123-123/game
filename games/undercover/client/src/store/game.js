@@ -112,6 +112,9 @@ export const useGameStore = defineStore('game', () => {
       voteResult.value = null
       gameOverData.value = null
       speakData.value = null
+      // 清空上一局的身份信息，等待新的 GAME_REVEAL 事件下发新身份
+      myRole.value = null
+      myWord.value = null
     })
 
     s.on(EVENTS.GAME_REVEAL, (data) => {
