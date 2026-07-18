@@ -171,6 +171,21 @@ var registry = require('./shared/game-registry');
 var games = registry.loadGames(path.join(__dirname, 'games'), app, io);
 loadedGames = games;
 
+// ===== 空闲清理调度 =====
+// 每 CLEANUP_INTERVAL_MS 检查一次，卸载空闲超时的游戏模块
+var cleanupInterval = setInterval(function() {
+	var unloaded = registry.runIdleCleanup(games);
+	if (unloaded > 0) {
+		// 手动触发 GC（需要 --expose-gc 标志，优雅降级）
+		if (global.gc) { global.gc(); }
+	}
+}, registry.CLEANUP_INTERVAL_MS);
+
+// 确保 cleanupInterval 不阻止进程退出
+if (cleanupInterval && cleanupInterval.unref) {
+	cleanupInterval.unref();
+}
+
 app.listen(PORT, '0.0.0.0', function() {
 	var os = require('os');
 	var nets = os.networkInterfaces();
@@ -190,7 +205,8 @@ app.listen(PORT, '0.0.0.0', function() {
 	lanIps.forEach(function(ip) {
 		console.log('局域网访问:  http://' + ip + ':' + PORT);
 	});
-	console.log('已加载 ' + games.length + ' 款游戏:');
+	console.log('已注册 ' + games.length + ' 款游戏（懒加载模式，空闲 ' +
+		(registry.IDLE_TIMEOUT_MS / 60000) + ' 分钟后自动卸载）:');
 	games.forEach(function(g) {
 		console.log('  - ' + g.config.name + ' → ' + g.config.route);
 	});
