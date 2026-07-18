@@ -1,10 +1,23 @@
 :root {
 	--primary: #6C5CE7;
+	--primary-light: #817AE8;
 	--accent: #FD79A8;
+	--accent-light: #FEA8C2;
 	--bg-dark: #1a1a2e;
+	--bg-card-dark: rgba(30, 30, 55, 0.95);
+	--bg-input-dark: rgba(40, 40, 70, 0.8);
 	--text-light: #f5f5f5;
-	--radius-md: 16px;
-	--shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.4);
+	--text-muted-dark: rgba(255, 255, 255, 0.5);
+	--text-light-dark: rgba(255, 255, 255, 0.3);
+	--border-dark: rgba(108, 92, 231, 0.2);
+	--radius-md: 20px;
+	--radius-lg: 24px;
+	--radius-sm: 12px;
+	--radius-full: 9999px;
+	--shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.5);
+	--shadow-xl: 0 24px 64px rgba(0, 0, 0, 0.6);
+	--transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	--transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -112,82 +125,136 @@ body {
 	position: fixed;
 	top: 50%;
 	left: 50%;
-	transform: translate(-50%, -50%);
-	background: rgba(20, 20, 40, 0.92);
-	backdrop-filter: blur(8px);
-	padding: 32px 40px;
-	border-radius: var(--radius-md);
-	border: 1px solid var(--primary);
-	box-shadow: var(--shadow-lg);
+	transform: translate(-50%, -50%) scale(0.95);
+	opacity: 0;
+	background: var(--bg-card-dark);
+	backdrop-filter: blur(16px);
+	-webkit-backdrop-filter: blur(16px);
+	padding: 36px 44px;
+	border-radius: var(--radius-lg);
+	border: 1px solid var(--border-dark);
+	box-shadow: var(--shadow-xl);
 	text-align: center;
 	z-index: 20;
-	min-width: 320px;
+	min-width: 340px;
 	max-width: 90vw;
+	transition: all var(--transition);
+}
+
+#game-over-panel:not(.hidden) {
+	transform: translate(-50%, -50%) scale(1);
+	opacity: 1;
 }
 
 #game-over-panel h2 {
-	font-size: 28px;
-	margin-bottom: 12px;
-	background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+	font-size: 32px;
+	margin-bottom: 14px;
+	font-weight: 900;
+	background: linear-gradient(135deg, var(--primary) 0%, #7C6FF0 50%, var(--accent) 100%);
 	-webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
 	background-clip: text;
+	text-shadow: 0 0 40px rgba(108, 92, 231, 0.3);
 }
 
 #game-over-panel p {
 	font-size: 16px;
 	color: var(--text-light);
-	margin-bottom: 16px;
+	margin-bottom: 20px;
 }
 
 #final-score {
-	font-size: 24px;
-	font-weight: 800;
+	font-size: 32px;
+	font-weight: 900;
 	color: var(--accent);
+	text-shadow: 0 0 20px rgba(253, 121, 168, 0.4);
 }
 
 .name-row {
 	display: flex;
-	gap: 8px;
-	margin-bottom: 12px;
+	gap: 10px;
+	margin-bottom: 16px;
 	justify-content: center;
 }
 
 #player-name {
 	flex: 1;
 	max-width: 180px;
-	padding: 8px 12px;
-	border-radius: 8px;
-	border: 1px solid #555;
-	background: #222;
-	color: #fff;
+	padding: 12px 16px;
+	border-radius: var(--radius-sm);
+	border: 1px solid var(--border-dark);
+	background: var(--bg-input-dark);
+	color: var(--text-light);
 	font-size: 14px;
+	outline: none;
+	transition: all var(--transition);
 }
 
 #player-name:focus {
 	outline: none;
 	border-color: var(--primary);
+	box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.3);
+	background: rgba(45, 45, 75, 0.9);
+}
+
+#player-name::placeholder {
+	color: var(--text-light-dark);
 }
 
 button {
-	background: var(--primary);
+	background: linear-gradient(135deg, var(--primary) 0%, #7C6FF0 50%, var(--accent) 100%);
 	color: #fff;
 	border: 0;
-	padding: 8px 16px;
-	border-radius: 8px;
+	padding: 12px 20px;
+	border-radius: var(--radius-sm);
 	cursor: pointer;
 	font-size: 14px;
 	font-weight: 600;
-	transition: opacity 0.2s, transform 0.1s;
+	transition: all var(--transition);
+	box-shadow: 0 4px 16px rgba(108, 92, 231, 0.35);
+	position: relative;
+	overflow: hidden;
 }
 
-button:hover { opacity: 0.85; }
-button:active { transform: scale(0.96); }
+button::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 2px;
+	background: linear-gradient(90deg, rgba(255,255,255,0.3) 0%, transparent 50%, rgba(255,255,255,0.3) 100%);
+	opacity: 0;
+	transition: opacity var(--transition);
+}
+
+button:hover { 
+	opacity: 1;
+	transform: translateY(-2px);
+	box-shadow: 0 8px 28px rgba(108, 92, 231, 0.5);
+}
+
+button:hover::before {
+	opacity: 1;
+}
+
+button:active { 
+	transform: translateY(0) scale(0.97); 
+}
 
 #restart-btn {
-	background: var(--accent);
-	margin-top: 4px;
+	background: linear-gradient(135deg, var(--accent) 0%, #FEA8C2 100%);
+	margin-top: 8px;
 	width: 100%;
+	box-shadow: 0 4px 16px rgba(253, 121, 168, 0.35);
+}
+
+#restart-btn:hover {
+	box-shadow: 0 8px 28px rgba(253, 121, 168, 0.5);
+}
+
+#submit-score-btn {
+	background: linear-gradient(135deg, var(--primary) 0%, #7C6FF0 100%);
 }
 
 #game-over-panel h3 {

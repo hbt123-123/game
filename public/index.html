@@ -7,66 +7,204 @@
 	<style>
 		:root {
 			--primary: #6C5CE7;
+			--primary-light: #817AE8;
+			--primary-dark: #5A4BD1;
 			--accent: #FD79A8;
+			--accent-light: #FEA8C2;
+			--accent-dark: #E84393;
 			--success: #00B894;
 			--bg-card: #FFFFFF;
+			--bg-card-hover: #FAFAFF;
 			--text: #2D3436;
 			--text-muted: #636E72;
-			--shadow-lg: 0 16px 48px rgba(108, 92, 231, 0.14);
-			--radius-lg: 20px;
-			--radius-md: 16px;
-			--transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+			--text-light: #B2BEC3;
+			--border: rgba(108, 92, 231, 0.08);
+			--shadow-sm: 0 2px 12px rgba(108, 92, 231, 0.06);
+			--shadow-md: 0 8px 28px rgba(108, 92, 231, 0.12);
+			--shadow-lg: 0 16px 48px rgba(108, 92, 231, 0.18);
+			--shadow-xl: 0 24px 64px rgba(108, 92, 231, 0.24);
+			--radius-lg: 24px;
+			--radius-md: 18px;
+			--radius-sm: 12px;
+			--radius-full: 9999px;
+			--transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			--transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 		}
 		* { margin: 0; padding: 0; box-sizing: border-box; }
 		body {
 			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
-			background: linear-gradient(135deg, #E8E5F7 0%, #F0EEF8 30%, #FDE8F0 70%, #FEE8F5 100%);
+			background: 
+				radial-gradient(ellipse at 20% 20%, rgba(108, 92, 231, 0.12) 0%, transparent 50%),
+				radial-gradient(ellipse at 80% 80%, rgba(253, 121, 168, 0.10) 0%, transparent 50%),
+				radial-gradient(ellipse at 50% 50%, rgba(162, 155, 254, 0.08) 0%, transparent 60%),
+				linear-gradient(135deg, #E8E5F7 0%, #F0EEF8 30%, #FDE8F0 70%, #FEE8F5 100%);
 			background-attachment: fixed;
 			min-height: 100vh;
 			color: var(--text);
 			-webkit-font-smoothing: antialiased;
+			-moz-osx-font-smoothing: grayscale;
 		}
-		.container { max-width: 760px; margin: 0 auto; padding: 40px 20px; }
-		.header { text-align: center; margin-bottom: 48px; animation: fadeIn 0.6s ease; }
-		@keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+		.container { max-width: 800px; margin: 0 auto; padding: 48px 24px; }
+		.header { text-align: center; margin-bottom: 56px; animation: fadeInUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+		@keyframes fadeInUp { 
+			from { opacity: 0; transform: translateY(24px); } 
+			to { opacity: 1; transform: translateY(0); } 
+		}
 		.header h1 {
-			font-size: 42px; font-weight: 800;
-			background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+			font-size: 52px; font-weight: 900;
+			background: linear-gradient(135deg, var(--primary) 0%, #7C6FF0 50%, var(--accent) 100%);
 			-webkit-background-clip: text; -webkit-text-fill-color: transparent;
-			background-clip: text; letter-spacing: -1px;
+			background-clip: text; 
+			letter-spacing: -2px;
+			text-shadow: 0 0 60px rgba(108, 92, 231, 0.3);
 		}
-		.header p { color: var(--text-muted); font-size: 16px; margin-top: 8px; }
+		.header p { 
+			color: var(--text-muted); 
+			font-size: 16px; 
+			margin-top: 12px;
+			font-weight: 400;
+			letter-spacing: 0.5px;
+		}
 		.game-grid { display: grid; gap: 20px; }
 		.game-card {
-			background: var(--bg-card); border-radius: var(--radius-lg);
-			padding: 28px 32px; box-shadow: var(--shadow-lg);
-			transition: transform var(--transition), box-shadow var(--transition);
-			cursor: pointer; text-decoration: none; color: inherit;
-			display: flex; align-items: center; gap: 20px;
-			animation: fadeIn 0.5s ease backwards;
+			background: var(--bg-card); 
+			border-radius: var(--radius-lg);
+			padding: 28px 32px; 
+			box-shadow: var(--shadow-md);
+			transition: all var(--transition);
+			cursor: pointer; 
+			text-decoration: none; 
+			color: inherit;
+			display: flex; 
+			align-items: center; 
+			gap: 20px;
+			animation: cardFadeIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+			position: relative;
+			overflow: hidden;
+			border: 1px solid var(--border);
 		}
-		.game-card:hover { transform: translateY(-4px); box-shadow: 0 20px 56px rgba(108, 92, 231, 0.2); }
+		.game-card::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			height: 3px;
+			background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+			opacity: 0;
+			transform: scaleX(0);
+			transition: opacity var(--transition), transform var(--transition);
+			transform-origin: left;
+		}
+		.game-card:hover::before {
+			opacity: 1;
+			transform: scaleX(1);
+		}
+		@keyframes cardFadeIn { 
+			from { opacity: 0; transform: translateY(16px) scale(0.98); } 
+			to { opacity: 1; transform: translateY(0) scale(1); } 
+		}
+		.game-card:hover { 
+			transform: translateY(-6px) scale(1.01); 
+			box-shadow: var(--shadow-xl);
+			background: var(--bg-card-hover);
+		}
+		.game-card:active {
+			transform: translateY(-2px) scale(0.995);
+		}
 		.game-icon {
-			width: 64px; height: 64px; border-radius: var(--radius-md);
+			width: 72px; 
+			height: 72px; 
+			border-radius: var(--radius-md);
 			background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-			display: flex; align-items: center; justify-content: center;
-			font-size: 32px; flex-shrink: 0; box-shadow: 0 6px 20px rgba(108, 92, 231, 0.3);
+			display: flex; 
+			align-items: center; 
+			justify-content: center;
+			font-size: 36px; 
+			flex-shrink: 0; 
+			box-shadow: 0 8px 24px rgba(108, 92, 231, 0.35);
 			font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Twemoji Mozilla", "EmojiSymbols", sans-serif;
 			line-height: 1;
+			position: relative;
+			transition: transform var(--transition), box-shadow var(--transition);
+		}
+		.game-icon::after {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			border-radius: var(--radius-md);
+			background: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%);
+		}
+		.game-card:hover .game-icon {
+			transform: scale(1.1);
+			box-shadow: 0 12px 32px rgba(108, 92, 231, 0.45);
 		}
 		.game-icon-img {
-			width: 64px; height: 64px; border-radius: var(--radius-md);
-			object-fit: cover; flex-shrink: 0;
-			box-shadow: 0 6px 20px rgba(108, 92, 231, 0.3);
+			width: 72px; 
+			height: 72px; 
+			border-radius: var(--radius-md);
+			object-fit: cover; 
+			flex-shrink: 0;
+			box-shadow: 0 8px 24px rgba(108, 92, 231, 0.35);
+			transition: transform var(--transition), box-shadow var(--transition);
 		}
-		.game-info h2 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-		.game-info p { color: var(--text-muted); font-size: 14px; line-height: 1.5; }
+		.game-card:hover .game-icon-img {
+			transform: scale(1.1);
+			box-shadow: 0 12px 32px rgba(108, 92, 231, 0.45);
+		}
+		.game-info h2 { 
+			font-size: 24px; 
+			font-weight: 800; 
+			margin-bottom: 6px;
+			letter-spacing: -0.3px;
+		}
+		.game-info p { 
+			color: var(--text-muted); 
+			font-size: 14px; 
+			line-height: 1.6;
+		}
 		.game-tag {
-			display: inline-block; padding: 3px 12px; background: #F1F0F8;
-			border-radius: 9999px; font-size: 12px; font-weight: 600;
-			color: var(--primary); margin-top: 8px;
+			display: inline-block; 
+			padding: 5px 14px; 
+			background: linear-gradient(135deg, rgba(108, 92, 231, 0.08) 0%, rgba(253, 121, 168, 0.08) 100%);
+			border-radius: var(--radius-full); 
+			font-size: 12px; 
+			font-weight: 600;
+			color: var(--primary); 
+			margin-top: 10px;
+			transition: all var(--transition-fast);
 		}
-		.footer { text-align: center; margin-top: 48px; color: var(--text-muted); font-size: 13px; }
+		.game-card:hover .game-tag {
+			background: linear-gradient(135deg, rgba(108, 92, 231, 0.15) 0%, rgba(253, 121, 168, 0.15) 100%);
+			transform: scale(1.05);
+		}
+		.footer { 
+			text-align: center; 
+			margin-top: 56px; 
+			color: var(--text-light); 
+			font-size: 13px;
+			padding-bottom: 24px;
+		}
+		.footer p {
+			letter-spacing: 1px;
+		}
+		@media (max-width: 640px) {
+			.container { padding: 32px 16px; }
+			.header h1 { font-size: 36px; letter-spacing: -1px; }
+			.game-card { padding: 20px 20px; gap: 16px; }
+			.game-icon, .game-icon-img { width: 56px; height: 56px; font-size: 28px; }
+			.game-info h2 { font-size: 20px; }
+			.game-info p { font-size: 13px; }
+		}
+		@media (prefers-reduced-motion: reduce) {
+			* {
+				animation-duration: 0.01ms !important;
+				transition-duration: 0.01ms !important;
+			}
+		}
 	</style>
 </head>
 <body>

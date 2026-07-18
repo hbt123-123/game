@@ -66,27 +66,44 @@ body {
 /* ===== 启动按钮 ===== */
 .launch-btn {
 	display: inline-block;
-	padding: 18px 88px;
-	font-size: 28px;
+	padding: 20px 96px;
+	font-size: 30px;
 	font-weight: 700;
-	letter-spacing: 12px;
+	letter-spacing: 14px;
 	color: #fff;
-	background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04));
-	border: 2px solid rgba(255, 255, 255, 0.35);
+	background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+	border: 2px solid rgba(255, 255, 255, 0.4);
 	border-radius: 50px;
 	cursor: pointer;
-	backdrop-filter: blur(10px);
-	-webkit-backdrop-filter: blur(10px);
+	backdrop-filter: blur(16px);
+	-webkit-backdrop-filter: blur(16px);
 	transition: all 0.3s ease;
 	outline: none;
 	font-family: inherit;
+	position: relative;
+	overflow: hidden;
+}
+
+.launch-btn::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: -100%;
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+	transition: left 0.6s ease;
+}
+
+.launch-btn:hover:not(:disabled)::before {
+	left: 100%;
 }
 
 .launch-btn:hover:not(:disabled) {
-	background: linear-gradient(135deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.08));
-	border-color: rgba(255, 255, 255, 0.65);
+	background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.1));
+	border-color: rgba(255, 255, 255, 0.7);
 	transform: scale(1.05);
-	box-shadow: 0 8px 32px rgba(255, 255, 255, 0.18);
+	box-shadow: 0 12px 40px rgba(255, 255, 255, 0.22), 0 0 60px rgba(108, 92, 231, 0.15);
 }
 
 .launch-btn:active:not(:disabled) {
@@ -94,7 +111,7 @@ body {
 }
 
 .launch-btn:disabled {
-	opacity: 0.6;
+	opacity: 0.5;
 	cursor: not-allowed;
 }
 
@@ -179,15 +196,16 @@ body {
 
 /* ===== 模态框 ===== */
 .modal-box {
-	background: rgba(25, 25, 45, 0.95);
-	border: 1px solid rgba(255, 255, 255, 0.12);
-	border-radius: 20px;
-	padding: 40px 48px;
+	background: rgba(25, 25, 45, 0.96);
+	border: 1px solid rgba(108, 92, 231, 0.3);
+	border-radius: 24px;
+	padding: 44px 52px;
 	text-align: center;
-	max-width: 420px;
+	max-width: 440px;
 	width: 90%;
-	backdrop-filter: blur(20px);
-	-webkit-backdrop-filter: blur(20px);
+	backdrop-filter: blur(24px);
+	-webkit-backdrop-filter: blur(24px);
+	box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6), 0 0 40px rgba(108, 92, 231, 0.1);
 }
 
 .modal-box h2 {
