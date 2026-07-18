@@ -22,6 +22,29 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+	width: 6px;
+}
+::-webkit-scrollbar-track {
+	background: rgba(255, 255, 255, 0.04);
+	border-radius: 3px;
+}
+::-webkit-scrollbar-thumb {
+	background: rgba(108, 92, 231, 0.35);
+	border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+	background: rgba(108, 92, 231, 0.55);
+}
+
+/* focus-visible 聚焦样式 */
+*:focus-visible {
+	outline: 2px solid var(--primary-light);
+	outline-offset: 3px;
+	border-radius: 4px;
+}
+
 html, body {
 	width: 100%;
 	height: 100%;
@@ -51,20 +74,26 @@ body {
 	height: 100% !important;
 }
 
+/* ==================== HUD ==================== */
 #hud {
 	position: fixed;
 	top: 20px;
 	left: 24px;
 	z-index: 10;
 	pointer-events: none;
-	text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
 }
 
 #score {
-	font-size: 36px;
-	font-weight: 800;
+	font-size: 52px;
+	font-weight: 900;
 	color: #fff;
 	line-height: 1.1;
+	text-shadow:
+		0 0 10px rgba(255, 255, 255, 0.6),
+		0 0 30px rgba(108, 92, 231, 0.5),
+		0 0 60px rgba(108, 92, 231, 0.3),
+		0 2px 8px rgba(0, 0, 0, 0.8);
+	letter-spacing: -1px;
 }
 
 #combo-hint {
@@ -73,8 +102,26 @@ body {
 	color: var(--accent);
 	margin-top: 4px;
 	min-height: 22px;
+	text-shadow: 0 0 12px rgba(253, 121, 168, 0.6);
+	animation: comboBounceIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
+@keyframes comboBounceIn {
+	0% {
+		opacity: 0;
+		transform: translateY(-16px) scale(0.6);
+	}
+	60% {
+		opacity: 1;
+		transform: translateY(3px) scale(1.08);
+	}
+	100% {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+}
+
+/* ==================== 蓄力条 ==================== */
 #charge-bar {
 	position: fixed;
 	bottom: 40px;
@@ -82,11 +129,23 @@ body {
 	transform: translateX(-50%);
 	width: 280px;
 	height: 10px;
-	background: rgba(255, 255, 255, 0.15);
+	background: rgba(255, 255, 255, 0.1);
 	border-radius: 999px;
 	overflow: hidden;
 	z-index: 10;
-	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+	box-shadow:
+		0 2px 12px rgba(0, 0, 0, 0.5),
+		0 0 20px rgba(108, 92, 231, 0.2),
+		inset 0 1px 2px rgba(255, 255, 255, 0.06);
+	/* 刻度线纹理 */
+	background-image: repeating-linear-gradient(
+		90deg,
+		transparent,
+		transparent 9%,
+		rgba(255, 255, 255, 0.07) 9%,
+		rgba(255, 255, 255, 0.07) 10%
+	);
+	background-color: rgba(255, 255, 255, 0.1);
 }
 
 #charge-bar-fill {
@@ -95,8 +154,33 @@ body {
 	background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
 	border-radius: 999px;
 	transition: width 0.05s linear;
+	box-shadow:
+		0 0 8px rgba(108, 92, 231, 0.5),
+		0 0 20px rgba(253, 121, 168, 0.3);
+	position: relative;
 }
 
+#charge-bar-fill.full {
+	animation: chargeFlash 0.4s ease-in-out infinite alternate;
+}
+
+@keyframes chargeFlash {
+	0% {
+		box-shadow:
+			0 0 8px rgba(253, 121, 168, 0.5),
+			0 0 20px rgba(253, 121, 168, 0.3);
+		filter: brightness(1);
+	}
+	100% {
+		box-shadow:
+			0 0 16px rgba(253, 121, 168, 0.8),
+			0 0 40px rgba(253, 121, 168, 0.5),
+			0 0 60px rgba(253, 121, 168, 0.2);
+		filter: brightness(1.2);
+	}
+}
+
+/* ==================== 分数浮动文字 ==================== */
 #score-floats {
 	position: fixed;
 	top: 0;
@@ -109,10 +193,13 @@ body {
 
 .score-float {
 	position: absolute;
-	font-size: 24px;
-	font-weight: 800;
+	font-size: 34px;
+	font-weight: 900;
 	color: var(--accent);
-	text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+	text-shadow:
+		0 0 10px rgba(253, 121, 168, 0.8),
+		0 0 25px rgba(253, 121, 168, 0.5),
+		0 2px 8px rgba(0, 0, 0, 0.9);
 	animation: floatUp 1s ease-out forwards;
 }
 
@@ -121,6 +208,7 @@ body {
 	100% { opacity: 0; transform: translateY(-80px) scale(1.4); }
 }
 
+/* ==================== 游戏结束面板 ==================== */
 #game-over-panel {
 	position: fixed;
 	top: 50%;
@@ -128,12 +216,15 @@ body {
 	transform: translate(-50%, -50%) scale(0.95);
 	opacity: 0;
 	background: var(--bg-card-dark);
-	backdrop-filter: blur(16px);
-	-webkit-backdrop-filter: blur(16px);
+	backdrop-filter: blur(24px) saturate(1.4);
+	-webkit-backdrop-filter: blur(24px) saturate(1.4);
 	padding: 36px 44px;
 	border-radius: var(--radius-lg);
-	border: 1px solid var(--border-dark);
-	box-shadow: var(--shadow-xl);
+	border: 1px solid rgba(108, 92, 231, 0.3);
+	box-shadow:
+		var(--shadow-xl),
+		0 0 80px rgba(108, 92, 231, 0.08),
+		inset 0 1px 0 rgba(255, 255, 255, 0.06);
 	text-align: center;
 	z-index: 20;
 	min-width: 340px;
@@ -154,7 +245,6 @@ body {
 	-webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
 	background-clip: text;
-	text-shadow: 0 0 40px rgba(108, 92, 231, 0.3);
 }
 
 #game-over-panel p {
@@ -164,12 +254,35 @@ body {
 }
 
 #final-score {
-	font-size: 32px;
+	font-size: 48px;
 	font-weight: 900;
-	color: var(--accent);
-	text-shadow: 0 0 20px rgba(253, 121, 168, 0.4);
+	background: linear-gradient(135deg, var(--accent) 0%, #FEA8C2 40%, var(--primary) 100%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	filter: drop-shadow(0 0 18px rgba(253, 121, 168, 0.5));
+	animation: scoreBounceIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
+@keyframes scoreBounceIn {
+	0% {
+		opacity: 0;
+		transform: scale(0.3);
+	}
+	50% {
+		opacity: 1;
+		transform: scale(1.12);
+	}
+	70% {
+		transform: scale(0.95);
+	}
+	100% {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+/* ==================== 昵称输入框 ==================== */
 .name-row {
 	display: flex;
 	gap: 10px;
@@ -192,15 +305,18 @@ body {
 
 #player-name:focus {
 	outline: none;
-	border-color: var(--primary);
-	box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.3);
-	background: rgba(45, 45, 75, 0.9);
+	border-color: var(--primary-light);
+	box-shadow:
+		0 0 0 3px rgba(108, 92, 231, 0.25),
+		0 0 16px rgba(108, 92, 231, 0.2);
+	background: rgba(50, 50, 85, 0.95);
 }
 
 #player-name::placeholder {
 	color: var(--text-light-dark);
 }
 
+/* ==================== 按钮 ==================== */
 button {
 	background: linear-gradient(135deg, var(--primary) 0%, #7C6FF0 50%, var(--accent) 100%);
 	color: #fff;
@@ -228,18 +344,20 @@ button::before {
 	transition: opacity var(--transition);
 }
 
-button:hover { 
+button:hover {
 	opacity: 1;
-	transform: translateY(-2px);
-	box-shadow: 0 8px 28px rgba(108, 92, 231, 0.5);
+	transform: translateY(-3px);
+	box-shadow:
+		0 8px 28px rgba(108, 92, 231, 0.5),
+		0 0 30px rgba(108, 92, 231, 0.2);
 }
 
 button:hover::before {
 	opacity: 1;
 }
 
-button:active { 
-	transform: translateY(0) scale(0.97); 
+button:active {
+	transform: translateY(0) scale(0.97);
 }
 
 #restart-btn {
@@ -250,13 +368,16 @@ button:active {
 }
 
 #restart-btn:hover {
-	box-shadow: 0 8px 28px rgba(253, 121, 168, 0.5);
+	box-shadow:
+		0 8px 28px rgba(253, 121, 168, 0.5),
+		0 0 30px rgba(253, 121, 168, 0.2);
 }
 
 #submit-score-btn {
 	background: linear-gradient(135deg, var(--primary) 0%, #7C6FF0 100%);
 }
 
+/* ==================== 排行榜 ==================== */
 #game-over-panel h3 {
 	font-size: 16px;
 	margin-top: 20px;
@@ -275,6 +396,29 @@ button:active {
 
 #ranking-list li {
 	color: var(--text-light);
+	animation: slideInFromLeft 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+#ranking-list li:nth-child(1) { animation-delay: 0.05s; }
+#ranking-list li:nth-child(2) { animation-delay: 0.1s; }
+#ranking-list li:nth-child(3) { animation-delay: 0.15s; }
+#ranking-list li:nth-child(4) { animation-delay: 0.2s; }
+#ranking-list li:nth-child(5) { animation-delay: 0.25s; }
+#ranking-list li:nth-child(6) { animation-delay: 0.3s; }
+#ranking-list li:nth-child(7) { animation-delay: 0.35s; }
+#ranking-list li:nth-child(8) { animation-delay: 0.4s; }
+#ranking-list li:nth-child(9) { animation-delay: 0.45s; }
+#ranking-list li:nth-child(10) { animation-delay: 0.5s; }
+
+@keyframes slideInFromLeft {
+	0% {
+		opacity: 0;
+		transform: translateX(-24px);
+	}
+	100% {
+		opacity: 1;
+		transform: translateX(0);
+	}
 }
 
 #ranking-list li strong {
@@ -282,6 +426,7 @@ button:active {
 	margin-left: 6px;
 }
 
+/* ==================== 加载提示 ==================== */
 #loading-tip {
 	position: fixed;
 	top: 50%;
@@ -290,10 +435,23 @@ button:active {
 	font-size: 18px;
 	color: var(--text-light);
 	z-index: 5;
+	animation: loadPulse 1.8s ease-in-out infinite;
 }
 
+@keyframes loadPulse {
+	0%, 100% {
+		opacity: 0.5;
+	}
+	50% {
+		opacity: 1;
+		text-shadow: 0 0 16px rgba(108, 92, 231, 0.5);
+	}
+}
+
+/* ==================== 工具类 ==================== */
 .hidden { display: none !important; }
 
+/* ==================== 响应式 & 无障碍 ==================== */
 @media (prefers-reduced-motion: reduce) {
 	* { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }

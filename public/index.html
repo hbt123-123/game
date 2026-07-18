@@ -43,28 +43,180 @@
 			color: var(--text);
 			-webkit-font-smoothing: antialiased;
 			-moz-osx-font-smoothing: grayscale;
+			overflow-x: hidden;
 		}
-		.container { max-width: 800px; margin: 0 auto; padding: 48px 24px; }
+
+		/* ===== 浮动装饰粒子 ===== */
+		.floating-orbs {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			pointer-events: none;
+			z-index: 0;
+			overflow: hidden;
+		}
+		.orb {
+			position: absolute;
+			border-radius: 50%;
+			filter: blur(60px);
+			opacity: 0.35;
+			animation: orbFloat 20s ease-in-out infinite;
+		}
+		.orb:nth-child(1) {
+			width: 300px; height: 300px;
+			background: var(--primary);
+			top: -80px; left: -60px;
+			animation-duration: 22s;
+		}
+		.orb:nth-child(2) {
+			width: 250px; height: 250px;
+			background: var(--accent);
+			top: 50%; right: -80px;
+			animation-duration: 18s;
+			animation-delay: -5s;
+		}
+		.orb:nth-child(3) {
+			width: 200px; height: 200px;
+			background: #A29BFE;
+			bottom: -50px; left: 40%;
+			animation-duration: 25s;
+			animation-delay: -10s;
+		}
+		@keyframes orbFloat {
+			0%, 100% { transform: translate(0, 0) scale(1); }
+			25% { transform: translate(30px, -40px) scale(1.1); }
+			50% { transform: translate(-20px, 20px) scale(0.95); }
+			75% { transform: translate(40px, 30px) scale(1.05); }
+		}
+
+		/* ===== 顶部导航 ===== */
+		.top-nav {
+			position: sticky;
+			top: 0;
+			z-index: 100;
+			background: rgba(255, 255, 255, 0.72);
+			backdrop-filter: blur(20px);
+			-webkit-backdrop-filter: blur(20px);
+			border-bottom: 1px solid var(--border);
+			padding: 0 24px;
+		}
+		.top-nav-inner {
+			max-width: 800px;
+			margin: 0 auto;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			height: 56px;
+		}
+		.nav-logo {
+			font-size: 20px;
+			font-weight: 800;
+			background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+			letter-spacing: -0.5px;
+		}
+		.nav-status {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			font-size: 13px;
+			color: var(--success);
+			font-weight: 600;
+		}
+		.nav-status::before {
+			content: '';
+			width: 8px;
+			height: 8px;
+			border-radius: 50%;
+			background: var(--success);
+			box-shadow: 0 0 8px rgba(0, 184, 148, 0.5);
+			animation: statusPulse 2s ease-in-out infinite;
+		}
+		@keyframes statusPulse {
+			0%, 100% { opacity: 1; transform: scale(1); }
+			50% { opacity: 0.5; transform: scale(0.8); }
+		}
+
+		/* ===== 主容器 ===== */
+		.container { max-width: 800px; margin: 0 auto; padding: 48px 24px; position: relative; z-index: 1; }
+
+		/* ===== Hero 区域 ===== */
 		.header { text-align: center; margin-bottom: 56px; animation: fadeInUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
 		@keyframes fadeInUp { 
 			from { opacity: 0; transform: translateY(24px); } 
 			to { opacity: 1; transform: translateY(0); } 
 		}
+		.header-badge {
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			padding: 6px 16px;
+			background: linear-gradient(135deg, rgba(108, 92, 231, 0.1) 0%, rgba(253, 121, 168, 0.1) 100%);
+			border: 1px solid rgba(108, 92, 231, 0.15);
+			border-radius: var(--radius-full);
+			font-size: 13px;
+			font-weight: 600;
+			color: var(--primary);
+			margin-bottom: 20px;
+			animation: fadeInUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s backwards;
+		}
+		.header-badge-dot {
+			width: 6px;
+			height: 6px;
+			border-radius: 50%;
+			background: var(--accent);
+			animation: statusPulse 2s ease-in-out infinite;
+		}
 		.header h1 {
-			font-size: 52px; font-weight: 900;
-			background: linear-gradient(135deg, var(--primary) 0%, #7C6FF0 50%, var(--accent) 100%);
+			font-size: 56px;
+			font-weight: 900;
+			background: linear-gradient(135deg, var(--primary) 0%, #7C6FF0 40%, var(--accent) 100%);
 			-webkit-background-clip: text; -webkit-text-fill-color: transparent;
 			background-clip: text; 
 			letter-spacing: -2px;
-			text-shadow: 0 0 60px rgba(108, 92, 231, 0.3);
+			line-height: 1.1;
+			margin-bottom: 12px;
 		}
 		.header p { 
 			color: var(--text-muted); 
-			font-size: 16px; 
-			margin-top: 12px;
+			font-size: 17px; 
 			font-weight: 400;
 			letter-spacing: 0.5px;
+			max-width: 360px;
+			margin: 0 auto;
+			line-height: 1.6;
 		}
+		.header-stats {
+			display: flex;
+			justify-content: center;
+			gap: 32px;
+			margin-top: 28px;
+			animation: fadeInUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s backwards;
+		}
+		.header-stat {
+			text-align: center;
+		}
+		.header-stat-val {
+			font-size: 28px;
+			font-weight: 900;
+			background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+		}
+		.header-stat-label {
+			font-size: 12px;
+			color: var(--text-light);
+			font-weight: 600;
+			letter-spacing: 0.5px;
+			margin-top: 2px;
+		}
+
+		/* ===== 游戏卡片网格 ===== */
 		.game-grid { display: grid; gap: 20px; }
 		.game-card {
 			background: var(--bg-card); 
@@ -96,9 +248,21 @@
 			transition: opacity var(--transition), transform var(--transition);
 			transform-origin: left;
 		}
+		.game-card::after {
+			content: '';
+			position: absolute;
+			inset: 0;
+			background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(108, 92, 231, 0.06) 0%, transparent 60%);
+			opacity: 0;
+			transition: opacity var(--transition);
+			pointer-events: none;
+		}
 		.game-card:hover::before {
 			opacity: 1;
 			transform: scaleX(1);
+		}
+		.game-card:hover::after {
+			opacity: 1;
 		}
 		@keyframes cardFadeIn { 
 			from { opacity: 0; transform: translateY(16px) scale(0.98); } 
@@ -112,6 +276,8 @@
 		.game-card:active {
 			transform: translateY(-2px) scale(0.995);
 		}
+
+		/* ===== 游戏图标 ===== */
 		.game-icon {
 			width: 72px; 
 			height: 72px; 
@@ -139,7 +305,7 @@
 			background: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%);
 		}
 		.game-card:hover .game-icon {
-			transform: scale(1.1);
+			transform: scale(1.1) rotate(-3deg);
 			box-shadow: 0 12px 32px rgba(108, 92, 231, 0.45);
 		}
 		.game-icon-img {
@@ -152,9 +318,11 @@
 			transition: transform var(--transition), box-shadow var(--transition);
 		}
 		.game-card:hover .game-icon-img {
-			transform: scale(1.1);
+			transform: scale(1.1) rotate(-3deg);
 			box-shadow: 0 12px 32px rgba(108, 92, 231, 0.45);
 		}
+
+		/* ===== 游戏信息 ===== */
 		.game-info h2 { 
 			font-size: 24px; 
 			font-weight: 800; 
@@ -166,6 +334,12 @@
 			font-size: 14px; 
 			line-height: 1.6;
 		}
+		.game-meta {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			margin-top: 10px;
+		}
 		.game-tag {
 			display: inline-block; 
 			padding: 5px 14px; 
@@ -174,90 +348,239 @@
 			font-size: 12px; 
 			font-weight: 600;
 			color: var(--primary); 
-			margin-top: 10px;
 			transition: all var(--transition-fast);
 		}
 		.game-card:hover .game-tag {
 			background: linear-gradient(135deg, rgba(108, 92, 231, 0.15) 0%, rgba(253, 121, 168, 0.15) 100%);
 			transform: scale(1.05);
 		}
+		.game-arrow {
+			margin-left: auto;
+			width: 36px;
+			height: 36px;
+			border-radius: 50%;
+			background: var(--bg-muted);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			flex-shrink: 0;
+			transition: all var(--transition);
+			opacity: 0;
+			transform: translateX(-8px);
+		}
+		.game-card:hover .game-arrow {
+			opacity: 1;
+			transform: translateX(0);
+			background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+		}
+		.game-arrow svg {
+			width: 16px;
+			height: 16px;
+			stroke: var(--text-muted);
+			stroke-width: 2.5;
+			fill: none;
+			stroke-linecap: round;
+			stroke-linejoin: round;
+			transition: stroke var(--transition);
+		}
+		.game-card:hover .game-arrow svg {
+			stroke: #fff;
+		}
+
+		/* ===== 底部 ===== */
 		.footer { 
 			text-align: center; 
 			margin-top: 56px; 
-			color: var(--text-light); 
-			font-size: 13px;
 			padding-bottom: 24px;
 		}
-		.footer p {
-			letter-spacing: 1px;
+		.footer-divider {
+			display: flex;
+			align-items: center;
+			gap: 16px;
+			margin-bottom: 20px;
 		}
+		.footer-divider::before,
+		.footer-divider::after {
+			content: '';
+			flex: 1;
+			height: 1px;
+			background: linear-gradient(90deg, transparent, var(--border), transparent);
+		}
+		.footer-divider span {
+			font-size: 12px;
+			color: var(--text-light);
+			letter-spacing: 2px;
+			text-transform: uppercase;
+			font-weight: 600;
+		}
+		.footer p {
+			color: var(--text-light); 
+			font-size: 13px;
+			letter-spacing: 0.5px;
+		}
+		.footer a {
+			color: var(--primary);
+			text-decoration: none;
+			font-weight: 600;
+			transition: color var(--transition-fast);
+		}
+		.footer a:hover {
+			color: var(--primary-dark);
+		}
+
+		/* ===== 响应式 ===== */
 		@media (max-width: 640px) {
 			.container { padding: 32px 16px; }
-			.header h1 { font-size: 36px; letter-spacing: -1px; }
+			.header h1 { font-size: 40px; letter-spacing: -1px; }
+			.header p { font-size: 15px; }
+			.header-stats { gap: 24px; }
+			.header-stat-val { font-size: 22px; }
 			.game-card { padding: 20px 20px; gap: 16px; }
 			.game-icon, .game-icon-img { width: 56px; height: 56px; font-size: 28px; }
 			.game-info h2 { font-size: 20px; }
 			.game-info p { font-size: 13px; }
+			.game-arrow { display: none; }
+			.top-nav-inner { height: 48px; }
+			.nav-logo { font-size: 17px; }
 		}
 		@media (prefers-reduced-motion: reduce) {
 			* {
 				animation-duration: 0.01ms !important;
 				transition-duration: 0.01ms !important;
 			}
+			.orb { animation: none; }
 		}
 	</style>
 </head>
 <body>
+	<!-- 浮动装饰 -->
+	<div class="floating-orbs">
+		<div class="orb"></div>
+		<div class="orb"></div>
+		<div class="orb"></div>
+	</div>
+
+	<!-- 顶部导航 -->
+	<nav class="top-nav">
+		<div class="top-nav-inner">
+			<span class="nav-logo">GameHub</span>
+			<div class="nav-status">在线运行中</div>
+		</div>
+	</nav>
+
 	<div class="container">
 		<div class="header">
+			<div class="header-badge">
+				<span class="header-badge-dot"></span>
+				实时多人小游戏平台
+			</div>
 			<h1>GameHub</h1>
-			<p>轻量级实时多人小游戏集合</p>
+			<p>和朋友一起玩，实时互动零延迟</p>
+			<div class="header-stats">
+				<div class="header-stat">
+					<div class="header-stat-val">5</div>
+					<div class="header-stat-label">款游戏</div>
+				</div>
+				<div class="header-stat">
+					<div class="header-stat-val">2</div>
+					<div class="header-stat-label">款多人</div>
+				</div>
+				<div class="header-stat">
+					<div class="header-stat-val">3D</div>
+					<div class="header-stat-label">WebGL</div>
+				</div>
+			</div>
 		</div>
+
 		<div class="game-grid">
 			<a class="game-card" href="/ydig" style="animation-delay: 0.1s;">
 				<div class="game-icon">🎨</div>
 				<div class="game-info">
 					<h2>你画我猜</h2>
 					<p>多人实时互动绘画猜词游戏，一人画多人猜。</p>
-					<span class="game-tag">多人 · 实时</span>
+					<div class="game-meta">
+						<span class="game-tag">多人 · 实时</span>
+					</div>
+				</div>
+				<div class="game-arrow">
+					<svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
 				</div>
 			</a>
+
 			<a class="game-card" href="/genshin" style="animation-delay: 0.15s;">
-					<img class="game-icon-img" src="/img/logo_home_header.82e54fa5.png" alt="原神">
-					<div class="game-info">
-						<h2>原神</h2>
-						<p>原神启动</p>
+				<img class="game-icon-img" src="/img/logo_home_header.82e54fa5.png" alt="原神">
+				<div class="game-info">
+					<h2>原神</h2>
+					<p>一键启动原神，自动检测安装路径。</p>
+					<div class="game-meta">
 						<span class="game-tag">工具 · 启动器</span>
 					</div>
-				</a>
-				<a class="game-card" href="/undercover" style="animation-delay: 0.2s;">
+				</div>
+				<div class="game-arrow">
+					<svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+				</div>
+			</a>
+
+			<a class="game-card" href="/undercover" style="animation-delay: 0.2s;">
 				<div class="game-icon">🕵️</div>
 				<div class="game-info">
 					<h2>谁是卧底</h2>
 					<p>多人聚会推理游戏，找出隐藏在人群中的卧底。</p>
-					<span class="game-tag">多人 · 推理</span>
+					<div class="game-meta">
+						<span class="game-tag">多人 · 推理</span>
+					</div>
+				</div>
+				<div class="game-arrow">
+					<svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
 				</div>
 			</a>
+
 			<a class="game-card" href="/snake" style="animation-delay: 0.3s;">
-			<div class="game-icon">🐍</div>
-			<div class="game-info">
-				<h2>贪吃蛇</h2>
-				<p>经典单人贪吃蛇，吃得越长越快，挑战全局最高分。</p>
-				<span class="game-tag">单人 · 排行榜</span>
-			</div>
-		</a>
-		<a class="game-card" href="/jumpjump" style="animation-delay: 0.4s;">
-			<div class="game-icon">🎮</div>
-			<div class="game-info">
-				<h2>JumpJump 跳一跳</h2>
-				<p>3D 蓄力跳跃精准小游戏，复刻微信跳一跳。</p>
-				<span class="game-tag">单人 · 3D · WebGL</span>
-			</div>
-		</a>
+				<div class="game-icon">🐍</div>
+				<div class="game-info">
+					<h2>贪吃蛇</h2>
+					<p>经典单人贪吃蛇，吃得越长越快，挑战全局最高分。</p>
+					<div class="game-meta">
+						<span class="game-tag">单人 · 排行榜</span>
+					</div>
+				</div>
+				<div class="game-arrow">
+					<svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+				</div>
+			</a>
+
+			<a class="game-card" href="/jumpjump" style="animation-delay: 0.4s;">
+				<div class="game-icon">🎮</div>
+				<div class="game-info">
+					<h2>JumpJump 跳一跳</h2>
+					<p>3D 蓄力跳跃精准小游戏，复刻微信跳一跳。</p>
+					<div class="game-meta">
+						<span class="game-tag">单人 · 3D · WebGL</span>
+					</div>
+				</div>
+				<div class="game-arrow">
+					<svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+				</div>
+			</a>
 		</div>
+
 		<div class="footer">
-			<p>更多游戏即将上线 &middot; GameHub v1.0</p>
+			<div class="footer-divider">
+				<span>GameHub</span>
+			</div>
+			<p>更多游戏即将上线 · GameHub v1.0</p>
 		</div>
 	</div>
+
+	<script>
+		// 卡片鼠标追踪光效
+		document.querySelectorAll('.game-card').forEach(function(card) {
+			card.addEventListener('mousemove', function(e) {
+				var rect = card.getBoundingClientRect();
+				card.style.setProperty('--mx', ((e.clientX - rect.left) / rect.width * 100) + '%');
+				card.style.setProperty('--my', ((e.clientY - rect.top) / rect.height * 100) + '%');
+			});
+		});
+	</script>
 </body>
 </html>
