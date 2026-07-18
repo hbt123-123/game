@@ -4,8 +4,11 @@ var fs = require('fs');
 var path = require('path');
 
 module.exports = function (io) {
-	// 日志文件路径：games/jumpjump/score.log
-	var LOG_FILE = path.join(__dirname, 'score.log');
+	// 日志文件路径：
+	// 1. 优先读环境变量 JUMPJUMP_SCORE_FILE（生产部署用，指向代码目录外的持久化位置）
+	// 2. 否则回退到项目目录下 score.log（本地开发默认）
+	// 这样 git pull / git clean 等部署操作不会清掉榜单数据
+	var LOG_FILE = process.env.JUMPJUMP_SCORE_FILE || path.join(__dirname, 'score.log');
 
 	// jumpjump 独立榜单（内存缓存，由日志文件重建）
 	var top10 = []; // { name: string, score: number, at: number }
