@@ -168,6 +168,22 @@ var JumpJumpGame = (function () {
 		return stage.userData.topY;
 	}
 
+	// 清理距离玩家太远的旧台子，避免对象无限累积
+	function cleanupFarStages(keepCount) {
+		if (stages.length <= keepCount) return;
+		var removeCount = stages.length - keepCount;
+		for (var i = 0; i < removeCount; i++) {
+			var stage = stages[i];
+			// 不要移除当前玩家所在的 currentStage 和即将跳的 nextStage
+			if (stage === currentStage || stage === nextStage) continue;
+			renderer.removeFromScene(stage);
+			stages.splice(i, 1);
+			i--;
+			removeCount--;
+			if (stages.length <= keepCount) break;
+		}
+	}
+
 	// 蓄力形变：压缩玩家身体与当前台子
 	function applyChargeSquash(chargeRatio) {
 		if (!player || !currentStage) return;
@@ -266,6 +282,8 @@ var JumpJumpGame = (function () {
 			currentStage = nextStage;
 			// 生成下一个台子
 			nextStage = spawnNextStage();
+			// 清理远处旧台子，保留最近 3 个（当前、下一个、再上一个）
+			cleanupFarStages(3);
 			state = 'idle';
 			JumpJumpPhysics.stop(jumpState);
 			return;

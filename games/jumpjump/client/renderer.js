@@ -2,6 +2,7 @@
 var JumpJumpRenderer = (function () {
 	var scene, camera, renderer, container;
 	var dirLight;
+	var ground;
 
 	function init(containerId) {
 		container = document.getElementById(containerId);
@@ -56,7 +57,7 @@ var JumpJumpRenderer = (function () {
 		// 地面
 		var groundGeo = new THREE.PlaneGeometry(60, 60);
 		var groundMat = new THREE.MeshStandardMaterial({ color: JUMPJUMP_CONFIG.COLOR_GROUND });
-		var ground = new THREE.Mesh(groundGeo, groundMat);
+		ground = new THREE.Mesh(groundGeo, groundMat);
 		ground.rotation.x = -Math.PI / 2;
 		ground.position.y = 0;
 		ground.receiveShadow = true;
@@ -97,6 +98,14 @@ var JumpJumpRenderer = (function () {
 		);
 		camera.position.lerp(desired, JUMPJUMP_CONFIG.CAMERA_LERP);
 		camera.lookAt(lookAtPos);
+
+		// 地面跟随玩家移动，形成"无限地面"效果，避免跑到世界边缘看到虚空背景
+		if (ground) {
+			var groundSize = 60;
+			var snap = function (v) { return Math.floor(v / groundSize + 0.5) * groundSize; };
+			ground.position.x = snap(targetPos.x);
+			ground.position.z = snap(targetPos.z);
+		}
 	}
 
 	function onResize() {
