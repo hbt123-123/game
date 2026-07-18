@@ -221,7 +221,8 @@ module.exports = function(io) {
 
 	io.on('connection', function(socket) {
 		var currentRoom = null;
-		var currentPlayer = null;
+		// 错误答案限流：1 秒窗口内最多 5 次错误，超出静默丢弃，防止暴力枚举词库
+		var wrongAnswerTimes = [];
 
 		socket.on('create_room', function(data) {
 			var username = (data && data.username) || '玩家';
@@ -245,6 +246,7 @@ module.exports = function(io) {
 				currentDrawerIndex: 0,
 				keyword: '',
 				roundTimer: null,
+				endRoundTimer: null,
 				answeredPlayers: [],
 				currentRound: 0,
 				completedCycles: 0,
@@ -253,7 +255,6 @@ module.exports = function(io) {
 			};
 
 			currentRoom = roomId;
-			currentPlayer = player;
 			socket.join(roomId);
 			socket.emit('room_created', { roomId: roomId, player: player });
 		});
@@ -285,7 +286,6 @@ module.exports = function(io) {
 
 			room.players.push(player);
 			currentRoom = roomId;
-			currentPlayer = player;
 			socket.join(roomId);
 
 			socket.emit('room_joined', { roomId: roomId, player: player, players: room.players, maxRounds: room.maxRounds });
@@ -305,7 +305,11 @@ module.exports = function(io) {
 			}
 			if (room.gameState !== 'waiting') return;
 
-			room.maxRounds = (data && data.maxRounds) || room.maxRounds;
+			// maxRounds 范围校验：1 ~ 10，防止负数/极大值破坏游戏流程
+			var newMaxRounds = (data && data.maxRounds != null) ? Number(data.maxRounds) : room.maxRounds;
+			if (isFinite(newMaxRounds) && newMaxRounds >= 1 && newMaxRounds <= 10) {
+				room.maxRounds = Math.floor(newMaxRounds);
+			}
 			room.gameState = 'playing';
 			room.currentDrawerIndex = 0;
 			room.currentRound = 0;
@@ -430,6 +434,13 @@ module.exports = function(io) {
 					endRound(room);
 				}
 			} else {
+				var now = Date.now();
+				wrongAnswerTimes = wrongAnswerTimes.filter(function(t) { return now - t < 1000; });
+				if (wrongAnswerTimes.length >= 5) {
+					// 限流：1 秒内错误超过 5 次，静默丢弃，防止暴力枚举
+					return;
+				}
+				wrongAnswerTimes.push(now);
 				socket.emit('answer_result', {
 					playerId: socket.id,
 					correct: false,
@@ -454,6 +465,7 @@ module.exports = function(io) {
 			}
 			if (room.players.length === 0) {
 				if (room.roundTimer) clearTimeout(room.roundTimer);
+				if (room.endRoundTimer) clearTimeout(room.endRoundTimer);
 				delete rooms[currentRoom];
 				return;
 			}
@@ -465,6 +477,7 @@ module.exports = function(io) {
 
 			if (room.players.length < 2) {
 				if (room.roundTimer) clearTimeout(room.roundTimer);
+				if (room.endRoundTimer) clearTimeout(room.endRoundTimer);
 				room.gameState = 'waiting';
 				io.to(currentRoom).emit('game_over', {
 					players: room.players,
@@ -486,6 +499,8 @@ module.exports = function(io) {
 	});
 
 	function startRound(room) {
+		// 防御：游戏已结束或房间已销毁时不再启动新一轮，防止 endRound 延迟触发导致状态混乱
+		if (!room || room.gameState !== 'playing') return;
 		room.answeredPlayers = [];
 		room.keyword = '';
 		room.roundStartTime = 0;
@@ -513,6 +528,7 @@ module.exports = function(io) {
 	function endRound(room, disconnectedDrawerName) {
 		if (room.roundTimer) clearTimeout(room.roundTimer);
 		room.roundTimer = null;
+		if (room.endRoundTimer) clearTimeout(room.endRoundTimer);
 
 		var drawer = room.players[room.currentDrawerIndex];
 		var drawerName = disconnectedDrawerName || (drawer && drawer.name) || '';
@@ -556,7 +572,8 @@ module.exports = function(io) {
 		});
 
 		if (room.completedCycles >= room.maxRounds) {
-			setTimeout(function() {
+			room.endRoundTimer = setTimeout(function() {
+				room.endRoundTimer = null;
 				room.gameState = 'waiting';
 				var sorted = room.players.slice().sort(function(a, b) { return b.score - a.score; });
 				io.to(room.id).emit('game_over', {
@@ -567,7 +584,8 @@ module.exports = function(io) {
 				});
 			}, 5000);
 		} else {
-			setTimeout(function() {
+			room.endRoundTimer = setTimeout(function() {
+				room.endRoundTimer = null;
 				room.currentDrawerIndex = nextIndex;
 				startRound(room);
 			}, 5000);

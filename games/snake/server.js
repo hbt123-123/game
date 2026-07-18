@@ -8,8 +8,9 @@ module.exports = function (io) {
 	// 贪吃蛇榜单（内存缓存，由日志文件重建）
 	var top10 = []; // { name: string, score: number, at: number }
 
-	// 速率限制：每 socket 提交间隔（毫秒）
+	// 速率限制：按玩家名冷却（毫秒），防止断开重连绕过
 	var SUBMIT_COOLDOWN_MS = 5000;
+	var nameLastSubmitAt = {}; // name → timestamp，跨连接共享
 
 	function sanitizeName(name) {
 		if (typeof name !== 'string') return '匿名玩家';
@@ -91,8 +92,6 @@ module.exports = function (io) {
 	loadFromLog();
 
 	io.on('connection', function (socket) {
-		var lastSubmitAt = 0;
-
 		socket.emit('top10', top10);
 
 		socket.on('request_top10', function () {
@@ -102,14 +101,17 @@ module.exports = function (io) {
 		socket.on('submit_score', function (data) {
 			if (!data) return;
 
-			// 速率限制：拒绝过于频繁的提交
+			var name = sanitizeName(data.name);
+
+			// 速率限制：按玩家名冷却，防止断开重连绕过
 			var now = Date.now();
-			if (now - lastSubmitAt < SUBMIT_COOLDOWN_MS) {
+			var lastAt = nameLastSubmitAt[name] || 0;
+			if (now - lastAt < SUBMIT_COOLDOWN_MS) {
 				socket.emit('score_submitted', {
 					rank: null,
 					score: 0,
 					error: 'rate_limited',
-					retryAfter: SUBMIT_COOLDOWN_MS - (now - lastSubmitAt)
+					retryAfter: SUBMIT_COOLDOWN_MS - (now - lastAt)
 				});
 				return;
 			}
@@ -121,9 +123,8 @@ module.exports = function (io) {
 			}
 
 			// 通过基本校验才更新限速时间戳，避免合法用户被无效请求误伤
-			lastSubmitAt = now;
+			nameLastSubmitAt[name] = now;
 
-			var name = sanitizeName(data.name);
 			var entry = {
 				name: name,
 				score: score,

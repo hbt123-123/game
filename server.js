@@ -14,18 +14,30 @@ function serveFile(res, filePath, contentType) {
 	fs.readFile(filePath, function(err, data) {
 		if (err) {
 			if (err.code === 'ENOENT') {
-				res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+				res.writeHead(404, {
+					'Content-Type': 'text/plain; charset=utf-8',
+					'X-Content-Type-Options': 'nosniff'
+				});
 				return res.end('Not Found');
 			}
 			console.error('[serveFile] IO 错误 ' + filePath + ': ' + err.message);
-			res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
+			res.writeHead(500, {
+				'Content-Type': 'text/plain; charset=utf-8',
+				'X-Content-Type-Options': 'nosniff'
+			});
 			return res.end('Internal Server Error');
 		}
 		var cacheControl = contentType === 'text/html' ? 'no-cache' : 'public, max-age=300';
-		res.writeHead(200, {
+		// 安全头：nosniff 阻止 MIME 嗅探；HTML 额外加 SAMEORIGIN 防点击劫持
+		var headers = {
 			'Content-Type': contentType,
-			'Cache-Control': cacheControl
-		});
+			'Cache-Control': cacheControl,
+			'X-Content-Type-Options': 'nosniff'
+		};
+		if (contentType === 'text/html') {
+			headers['X-Frame-Options'] = 'SAMEORIGIN';
+		}
+		res.writeHead(200, headers);
 		res.end(data);
 	});
 }
@@ -58,12 +70,12 @@ function safeResolve(rootDir, relative) {
 }
 
 function sendForbidden(res) {
-	res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
+	res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8', 'X-Content-Type-Options': 'nosniff' });
 	res.end('Forbidden');
 }
 
 function sendNotFound(res) {
-	res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+	res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8', 'X-Content-Type-Options': 'nosniff' });
 	res.end('Not Found');
 }
 
@@ -117,7 +129,7 @@ function handler(req, res) {
 		if (useDist) {
 			clientRoot = path.join(clientRoot, 'dist');
 		} else if (g.config.id === 'undercover') {
-			res.writeHead(503, { 'Content-Type': 'text/html; charset=utf-8' });
+			res.writeHead(503, { 'Content-Type': 'text/html; charset=utf-8', 'X-Content-Type-Options': 'nosniff', 'X-Frame-Options': 'SAMEORIGIN' });
 			return res.end('<h1>谁是卧底 — 未构建</h1><p>请先在 <code>games/undercover/client/</code> 目录执行：</p><pre>npm install &amp;&amp; npm run build</pre>');
 		}
 

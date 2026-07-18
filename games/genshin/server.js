@@ -71,6 +71,9 @@ module.exports = function(io) {
 		});
 	}
 
+	// 允许启动的 exe 文件名白名单（防止任意 exe 启动 / 命令注入）
+	var ALLOWED_EXE_NAMES = ['YuanShen.exe', 'GenshinImpact.exe'];
+
 	io.on('connection', function(socket) {
 		socket.on('scan_game', function(data) {
 			// 二次校验：服务端 + 客户端都必须支持
@@ -83,27 +86,48 @@ module.exports = function(io) {
 		});
 
 		socket.on('launch_game', function(data) {
-			if (!data || !data.path) {
+			// 平台守卫：仅 Windows 服务端允许启动
+			if (process.platform !== 'win32') {
+				socket.emit('launch_result', { success: false, error: 'platform_not_supported' });
+				return;
+			}
+			if (!data || typeof data.path !== 'string') {
 				socket.emit('launch_result', { success: false, error: 'invalid_path' });
 				return;
 			}
 
 			var exePath = data.path;
+
+			// 白名单校验：仅允许启动原神 exe，避免任意 exe 启动
+			var baseName = path.basename(exePath);
+			var isAllowed = ALLOWED_EXE_NAMES.some(function(name) {
+				return baseName.toLowerCase() === name.toLowerCase();
+			});
+			if (!isAllowed) {
+				socket.emit('launch_result', { success: false, error: 'exe_not_allowed' });
+				return;
+			}
+
 			if (!fs.existsSync(exePath)) {
 				socket.emit('launch_result', { success: false, error: 'exe_not_found' });
 				return;
 			}
 
-			// 使用 start 命令启动，空字符串为窗口标题（start 命令语法要求）
-			// 使用 execFile + 参数数组避免 shell 解析导致的命令注入
-			var cmdPath = process.env.COMSPEC || 'cmd.exe';
-			child_process.execFile(cmdPath, ['/c', 'start', '', exePath], function(err) {
-				if (err) {
-					socket.emit('launch_result', { success: false, error: err.message });
-				} else {
-					socket.emit('launch_result', { success: true });
-				}
-			});
+			// 直接 spawn 启动 exe，避免经过 cmd.exe 导致的命令行解析风险
+			// detached + stdio:'ignore' + unref 让子进程独立于服务端运行
+			try {
+				var child = child_process.spawn(exePath, [], {
+					detached: true,
+					stdio: 'ignore'
+				});
+				child.on('error', function(err) {
+					console.error('[genshin] 启动失败 ' + exePath + ': ' + err.message);
+				});
+				child.unref();
+				socket.emit('launch_result', { success: true });
+			} catch (err) {
+				socket.emit('launch_result', { success: false, error: err.message });
+			}
 		});
 	});
 

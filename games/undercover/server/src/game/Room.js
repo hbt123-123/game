@@ -122,31 +122,31 @@ class Room {
   }
 
   updateConfig(playerCount, spyCount, blankCount) {
-    const count = Number(playerCount)
-    const spies = Number(spyCount)
-    const blanks = blankCount !== undefined ? Number(blankCount) : this.config.blankCount
+    let count = Number(playerCount)
+    let spies = Number(spyCount)
+    let blanks = blankCount !== undefined ? Number(blankCount) : this.config.blankCount
 
     if (count < GAME_CONFIG.MIN_PLAYERS || count > GAME_CONFIG.MAX_PLAYERS) {
-      playerCount = Math.max(GAME_CONFIG.MIN_PLAYERS, Math.min(GAME_CONFIG.MAX_PLAYERS, count))
+      count = Math.max(GAME_CONFIG.MIN_PLAYERS, Math.min(GAME_CONFIG.MAX_PLAYERS, count))
     }
     if (spies < GAME_CONFIG.MIN_SPIES || spies > GAME_CONFIG.MAX_SPIES) {
-      spyCount = Math.max(GAME_CONFIG.MIN_SPIES, Math.min(GAME_CONFIG.MAX_SPIES, spies))
+      spies = Math.max(GAME_CONFIG.MIN_SPIES, Math.min(GAME_CONFIG.MAX_SPIES, spies))
     }
     if (blanks < GAME_CONFIG.MIN_BLANKS || blanks > GAME_CONFIG.MAX_BLANKS) {
-      blankCount = Math.max(GAME_CONFIG.MIN_BLANKS, Math.min(GAME_CONFIG.MAX_BLANKS, blanks))
+      blanks = Math.max(GAME_CONFIG.MIN_BLANKS, Math.min(GAME_CONFIG.MAX_BLANKS, blanks))
     }
-    if (blankCount > 0 && playerCount < 5) {
-      blankCount = 0
-    }
-
-    if (!Room.validateConfig(playerCount, spyCount, blankCount)) {
-      spyCount = Math.ceil(playerCount / 4)
-      blankCount = playerCount >= 5 ? 1 : 0
+    if (blanks > 0 && count < 5) {
+      blanks = 0
     }
 
-    this.config.playerCount = playerCount
-    this.config.spyCount = spyCount
-    this.config.blankCount = blankCount
+    if (!Room.validateConfig(count, spies, blanks)) {
+      spies = Math.ceil(count / 4)
+      blanks = count >= 5 ? 1 : 0
+    }
+
+    this.config.playerCount = count
+    this.config.spyCount = spies
+    this.config.blankCount = blanks
   }
 
   canStart() {
@@ -261,14 +261,6 @@ class Room {
       return 'discussDone'
     }
     return 'nextSpeaker'
-  }
-
-  startVoting() {
-    this.phase = GamePhase.VOTING
-    this.players.forEach(p => {
-      p.votedFor = null
-      p.voteCount = 0
-    })
   }
 
   castVote(voterSocketId, targetPlayerId) {
