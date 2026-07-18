@@ -8,6 +8,8 @@ var JumpJumpInput = (function () {
 		function onStart(e) {
 			// 防止鼠标右键/中键触发
 			if (e.button !== undefined && e.button !== 0) return;
+			// 仅响应 canvas 上的触摸，避免拦截面板上 input/button 的事件
+			if (e.target !== domElement) return;
 			e.preventDefault();
 			if (isCharging) return;
 			isCharging = true;
@@ -17,8 +19,10 @@ var JumpJumpInput = (function () {
 
 		function onEnd(e) {
 			if (e.button !== undefined && e.button !== 0) return;
-			e.preventDefault();
+			// 关键：未蓄力时直接放行，不调用 preventDefault，
+			// 否则 window 上的 touchend 会吞掉 click，导致 input 无法聚焦、按钮点不动
 			if (!isCharging) return;
+			e.preventDefault();
 			isCharging = false;
 			var elapse = (performance.now() - chargeStartTime) / 1000;
 			if (callbacks && callbacks.onChargeEnd) callbacks.onChargeEnd(elapse);

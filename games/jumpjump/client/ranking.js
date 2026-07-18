@@ -2,12 +2,22 @@
 // 事件：submit_score / request_top10 / top10 / score_submitted
 var JumpJumpRanking = (function () {
 	var socket = null;
+	var submitTimer = null;
+	var SUBMIT_TIMEOUT_MS = 5000; // 提交超时：5 秒未收到响应则恢复按钮
 
 	function init() {
 		// path 必须与 game.json 中 socketPath 一致
 		socket = io({ path: '/jumpjump/socket.io' });
 		socket.on('top10', renderRanking);
 		socket.on('score_submitted', onSubmitResult);
+		// 断线重连保护：重连后重新拉取榜单，并恢复卡住的提交按钮
+		socket.on('connect', function () {
+			requestTop10();
+		});
+		socket.on('disconnect', function () {
+			clearTimeout(submitTimer);
+			recoverSubmitButton('网络断开，请重试');
+		});
 		return socket;
 	}
 
@@ -16,7 +26,22 @@ var JumpJumpRanking = (function () {
 	}
 
 	function submitScore(name, score) {
-		if (socket) socket.emit('submit_score', { name: name, score: score });
+		if (!socket) return;
+		socket.emit('submit_score', { name: name, score: score });
+		// 超时保护：服务端未响应时恢复按钮，避免永远卡在"提交中..."
+		clearTimeout(submitTimer);
+		submitTimer = setTimeout(function () {
+			recoverSubmitButton('提交超时，请重试');
+		}, SUBMIT_TIMEOUT_MS);
+	}
+
+	// 恢复提交按钮为可点击状态
+	function recoverSubmitButton(text) {
+		var btn = document.getElementById('submit-score-btn');
+		if (btn && btn.disabled) {
+			btn.disabled = false;
+			btn.textContent = text || '提交分数';
+		}
 	}
 
 	// 渲染 Top 10 列表到 #ranking-list
@@ -42,19 +67,22 @@ var JumpJumpRanking = (function () {
 
 	// 提交结果反馈：高亮新记录 / 提示错误
 	function onSubmitResult(res) {
+		clearTimeout(submitTimer); // 收到响应，清除超时保护
 		if (!res) return;
 		var btn = document.getElementById('submit-score-btn');
 		if (res.error === 'rate_limited') {
 			if (btn) {
+				btn.disabled = false; // 恢复可点击，允许稍后重试
 				btn.textContent = '提交太快，请稍候';
-				setTimeout(function () { btn.textContent = '提交分数'; }, 1500);
+				setTimeout(function () { if (!btn.disabled) btn.textContent = '提交分数'; }, 1500);
 			}
 			return;
 		}
 		if (res.error === 'invalid_score') {
 			if (btn) {
+				btn.disabled = false;
 				btn.textContent = '分数无效';
-				setTimeout(function () { btn.textContent = '提交分数'; }, 1500);
+				setTimeout(function () { if (!btn.disabled) btn.textContent = '提交分数'; }, 1500);
 			}
 			return;
 		}
