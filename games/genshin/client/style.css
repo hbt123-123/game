@@ -523,8 +523,9 @@ body::after {
 /* ===== 模态框按钮 ===== */
 .modal-actions {
 	display: flex;
-	gap: 16px;
+	gap: 12px;
 	justify-content: center;
+	flex-wrap: wrap;
 	margin-bottom: 24px;
 }
 
@@ -540,6 +541,64 @@ body::after {
 	position: relative;
 	overflow: hidden;
 	outline: none;
+	border: none;
+	font-family: inherit;
+}
+
+/* 一键启动按钮 - 主操作，白金渐变（在紫色背景上最显眼） */
+.protocol-btn {
+	background: linear-gradient(135deg, #ffffff, #d4c5f9);
+	color: #2d2649;
+	border: 1px solid rgba(255, 255, 255, 0.6);
+	box-shadow:
+		0 4px 16px rgba(255, 255, 255, 0.25),
+		0 0 24px rgba(162, 155, 254, 0.4);
+}
+
+.protocol-btn::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: -100%;
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+	transition: left 0.5s ease;
+}
+
+.protocol-btn:hover:not(:disabled) {
+	transform: translateY(-2px);
+	box-shadow:
+		0 10px 32px rgba(255, 255, 255, 0.35),
+		0 0 36px rgba(162, 155, 254, 0.6);
+}
+
+.protocol-btn:hover:not(:disabled)::before {
+	left: 100%;
+}
+
+.protocol-btn:disabled {
+	opacity: 0.75;
+	cursor: not-allowed;
+	transform: none;
+}
+
+/* 启动中脉冲动画 */
+.protocol-btn.is-launching {
+	animation: protocol-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes protocol-pulse {
+	0%, 100% {
+		box-shadow:
+			0 4px 16px rgba(255, 255, 255, 0.25),
+			0 0 24px rgba(162, 155, 254, 0.4);
+	}
+	50% {
+		box-shadow:
+			0 4px 16px rgba(255, 255, 255, 0.45),
+			0 0 40px rgba(162, 155, 254, 0.8);
+	}
 }
 
 /* 下载按钮 - 悬停光效 */
@@ -571,6 +630,35 @@ body::after {
 	left: 100%;
 }
 
+/* HoYoPlay 启动器按钮 - 紫色玻璃风 */
+.hoyoplay-btn {
+	background: rgba(108, 92, 231, 0.18);
+	color: #fff;
+	border: 1px solid rgba(108, 92, 231, 0.45);
+}
+
+.hoyoplay-btn::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: -100%;
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+	transition: left 0.5s ease;
+}
+
+.hoyoplay-btn:hover {
+	background: rgba(108, 92, 231, 0.3);
+	transform: translateY(-2px);
+	border-color: rgba(108, 92, 231, 0.75);
+	box-shadow: 0 6px 20px rgba(108, 92, 231, 0.25);
+}
+
+.hoyoplay-btn:hover::before {
+	left: 100%;
+}
+
 /* 云游戏按钮 - 悬停光效 */
 .cloud-btn {
 	background: rgba(255, 255, 255, 0.08);
@@ -598,6 +686,21 @@ body::after {
 
 .cloud-btn:hover::before {
 	left: 100%;
+}
+
+/* ===== 协议唤起提示文字 ===== */
+.protocol-hint {
+	color: rgba(255, 255, 255, 0.55);
+	font-size: 12px;
+	line-height: 1.6;
+	margin: -8px 0 20px;
+	min-height: 16px;
+	animation: hint-fade-in 0.4s ease both;
+}
+
+@keyframes hint-fade-in {
+	from { opacity: 0; transform: translateY(-4px); }
+	to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ===== 模态框关闭按钮 ===== */

@@ -59,17 +59,36 @@
 				<h2>{{ modalTitle }}</h2>
 				<p>{{ modalMessage }}</p>
 				<div class="modal-actions">
+					<!-- 一键启动：通过自定义协议唤起本机原神（仅 PC 引导模式） -->
+					<button v-if="showProtocolBtn"
+							class="modal-btn protocol-btn"
+							:class="{ 'is-launching': protocolLaunching }"
+							:disabled="protocolLaunching"
+							@click="tryLaunchViaProtocol">
+						<span v-if="!protocolLaunching">一键启动</span>
+						<span v-else>正在唤起...</span>
+					</button>
+					<!-- 下载按钮 -->
 					<a v-if="showDownloadBtn" class="modal-btn download-btn"
 					   :href="downloadUrl"
 					   target="_blank">
 						{{ downloadLabel }}
 					</a>
+					<!-- HoYoPlay 官方启动器（仅 PC 引导模式） -->
+					<a v-if="showHoyoplayBtn" class="modal-btn hoyoplay-btn"
+					   href="https://hyp.mihoyo.com/"
+					   target="_blank">
+						HoYoPlay
+					</a>
+					<!-- 云游戏 -->
 					<a class="modal-btn cloud-btn"
 					   href="https://ys.mihoyo.com/cloud/?utm_source=yuanshen_web#/"
 					   target="_blank">
 						云游戏
 					</a>
 				</div>
+				<!-- 协议唤起提示 -->
+				<p v-if="protocolHint" class="protocol-hint">{{ protocolHint }}</p>
 				<button class="modal-close" @click="showModal = false">关闭</button>
 			</div>
 		</div>

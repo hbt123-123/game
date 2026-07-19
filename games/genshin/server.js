@@ -3,6 +3,16 @@ var fs = require('fs');
 var path = require('path');
 
 module.exports = function(io) {
+	// ===== 环境守卫 =====
+	// 浏览器无法读取访客电脑的注册表，也无法直接启动访客电脑上的 exe。
+	// 服务端扫描/启动只能在「本地 Windows 开发模式」下生效——此时服务端 = 访客机。
+	// 部署到服务器（Linux 或 Windows）后，必须降级为客户端引导模式。
+	// 判定条件：服务端是 Windows，且未显式声明生产环境。
+	function isLocalDev() {
+		return process.platform === 'win32' && process.env.NODE_ENV !== 'production';
+	}
+	var LOCAL_DEV = isLocalDev();
+
 	// 原神注册表路径（国服 + 国际服）
 	var REG_PATHS = [
 		{ key: 'HKCU\\Software\\miHoYo\\HYP\\1_1\\hk4e_cn',           label: 'cn_mihoyo' },
@@ -75,20 +85,25 @@ module.exports = function(io) {
 	var ALLOWED_EXE_NAMES = ['YuanShen.exe', 'GenshinImpact.exe'];
 
 	io.on('connection', function(socket) {
+		// 连接时告知客户端当前是否为本地开发模式
+		// 客户端据此决定走「服务端扫描」还是「客户端引导」
+		socket.emit('env_info', { localDev: LOCAL_DEV, platform: process.platform });
+
 		socket.on('scan_game', function(data) {
-			// 二次校验：服务端 + 客户端都必须支持
-			// 客户端已在前端拦截非 Windows，这里作为安全保障
-			if (process.platform !== 'win32') {
-				socket.emit('scan_result', { found: false, reason: 'platform_not_supported' });
+			// 环境守卫：仅本地 Windows 开发模式启用注册表扫描
+			// 生产环境（部署到服务器）下浏览器无法检测访客电脑注册表，
+			// 直接告知客户端走引导流程
+			if (!LOCAL_DEV) {
+				socket.emit('scan_result', { found: false, reason: 'disabled_in_production' });
 				return;
 			}
 			scanRegistry(0, socket);
 		});
 
 		socket.on('launch_game', function(data) {
-			// 平台守卫：仅 Windows 服务端允许启动
-			if (process.platform !== 'win32') {
-				socket.emit('launch_result', { success: false, error: 'platform_not_supported' });
+			// 环境守卫：仅本地 Windows 开发模式允许启动 exe
+			if (!LOCAL_DEV) {
+				socket.emit('launch_result', { success: false, error: 'disabled_in_production' });
 				return;
 			}
 			if (!data || typeof data.path !== 'string') {
@@ -131,6 +146,6 @@ module.exports = function(io) {
 		});
 	});
 
-	console.log('原神 已加载');
+	console.log('原神 已加载（模式：' + (LOCAL_DEV ? '本地开发' : '生产引导') + '）');
 	return { name: '原神', route: '/genshin' };
 };
