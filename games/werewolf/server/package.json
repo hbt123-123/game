@@ -1,0 +1,26 @@
+﻿{
+  "name": "werewolf-server",
+  "version": "1.0.0",
+  "description": "狼人杀后端",
+  "main": "dist/server/src/ws.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "nodemon",
+    "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\""
+  },
+  "_moduleAliases": {
+    "@shared": "./dist/shared"
+  },
+  "dependencies": {
+    "module-alias": "^2.2.3",
+    "socket.io": "^4.7.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/socket.io": "^3.0.2",
+    "nodemon": "^3.0.2",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.3.3"
+  }
+}

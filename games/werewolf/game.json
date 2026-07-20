@@ -1,0 +1,12 @@
+{
+  "id": "werewolf",
+  "name": "狼人杀",
+  "description": "经典狼人杀游戏，村民与狼人的推理对决",
+  "version": "1.0.0",
+  "route": "/werewolf",
+  "socketPath": "/werewolf/socket.io",
+  "maxPlayers": 12,
+  "minPlayers": 6,
+  "clientDir": "client",
+  "serverFile": "server.js"
+}

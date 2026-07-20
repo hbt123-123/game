@@ -1,0 +1,27 @@
+{
+  "name": "werewolf-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "easyqrcodejs": "^4.3.3",
+    "sha256": "^0.2.0",
+    "socket.io-client": "^4.7.4",
+    "vue": "^3.4.21",
+    "vue-router": "^4.3.0"
+  },
+  "devDependencies": {
+    "@types/sha256": "^0.2.0",
+    "@types/socket.io-client": "^1.4.36",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "@vue/compiler-sfc": "^3.4.21",
+    "sass": "^1.71.0",
+    "typescript": "^5.3.3",
+    "vite": "^5.1.6"
+  }
+}
